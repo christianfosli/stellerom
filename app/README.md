@@ -2,6 +2,12 @@
 
 ### Usage
 
+Set required environment variable(s):
+
+```
+export GOOGLE_MAPS_API_KEY=YOUR_API_KEY_FROM_GOOGLE_CLOUD
+```
+
 Start the project:
 
 ```
