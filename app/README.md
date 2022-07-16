@@ -1,6 +1,9 @@
-# fresh project
+# Stellebord App
 
-### Usage
+The frontend app.
+Made with [Deno's Fresh framework](https://fresh.deno.dev/) and deployed using Deno Deploy.
+
+### Running locally
 
 Set required environment variable(s):
 
