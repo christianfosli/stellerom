@@ -3,9 +3,11 @@ import { h } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { tw } from "@twind";
 import { Loader } from "@googlemaps/js-api-loader";
+import { ChangingRoom } from "../routes/index.tsx";
 
 interface MapProps {
   apiKey: string;
+  changingRooms: ChangingRoom[];
 }
 
 const centerOfNorway = { lat: 64.68, lng: 9.39 };
@@ -30,7 +32,7 @@ export default function MyMap(props: MapProps) {
       });
 
       const google = await loader.load();
-      console.info("Google maps loaded");
+      console.info("Google maps API loaded");
 
       setGoogle(google);
     };
@@ -43,18 +45,31 @@ export default function MyMap(props: MapProps) {
       return;
     }
 
-    if (map === null) {
-      setMap(
-        new google.maps.Map(mapDiv.current, {
-          center: centerOfNorway,
-          zoom: defaultZoom,
-        }),
-      );
-      console.info("Map rendered initially");
-    } else {
-      console.warn("This shouldn't happen??");
-    }
-  }, [google]);
+    const m = new google.maps.Map(mapDiv.current, {
+      center: centerOfNorway,
+      zoom: defaultZoom,
+    });
+
+    const roomMarkers = props.changingRooms.map((r) => {
+      return new google.maps.Marker({
+        position: r.location,
+        label: r.name,
+        // TODO: We can add a custom icon resembling a changing room here
+        map: m,
+      });
+    });
+
+    setMap(m);
+
+    console.info(
+      `Map of ${props.changingRooms.length} rooms rendered`,
+    );
+
+    return () => {
+      roomMarkers.forEach((r) => r.setMap(null));
+      setMap(null);
+    };
+  }, [google, props.changingRooms]);
 
   const showCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
