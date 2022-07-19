@@ -9,6 +9,7 @@ interface MapProps {
 }
 
 const centerOfNorway = { lat: 64.68, lng: 9.39 };
+const defaultZoom = 4;
 
 export default function MyMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
@@ -20,9 +21,6 @@ export default function MyMap(props: MapProps) {
   // map type from google maps API. I couldn't figure out how to get type into typescript
   // deno-lint-ignore no-explicit-any
   const [map, setMap] = useState<any>(null);
-
-  const [center, setCenter] = useState(centerOfNorway);
-  const [zoom, setZoom] = useState(4);
 
   useEffect(() => {
     const load = async () => {
@@ -46,23 +44,35 @@ export default function MyMap(props: MapProps) {
     }
 
     if (map === null) {
-      setMap(new google.maps.Map(mapDiv.current, { center, zoom }));
+      setMap(
+        new google.maps.Map(mapDiv.current, {
+          center: centerOfNorway,
+          zoom: defaultZoom,
+        }),
+      );
       console.info("Map rendered initially");
     } else {
-      map.setCenter(center);
-      map.setZoom(zoom);
-      console.info("Map updated");
+      console.warn("This shouldn't happen??");
     }
-  }, [google, center, zoom]);
+  }, [google]);
 
-  const goToCurrentLocation = () => {
+  const showCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        setCenter({
+        console.info("Got current location from browser");
+
+        const pos = {
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-        });
-        setZoom(17);
+        };
+
+        const infoWindow = new google!.maps.InfoWindow();
+        infoWindow.setPosition(pos);
+        infoWindow.setContent("Du er her");
+        infoWindow.open(map);
+
+        map.setCenter(pos);
+        map.setZoom(17);
       },
       (error) => console.error(error),
     );
@@ -77,9 +87,9 @@ export default function MyMap(props: MapProps) {
         class={tw
           `inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
         type="button"
-        onClick={goToCurrentLocation}
+        onClick={showCurrentLocation}
       >
-        Naviger til min plassering
+        Gå til min plassering
       </button>
     </div>
   );
