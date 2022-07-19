@@ -25,6 +25,10 @@ export default function MyMap(props: MapProps) {
   const [map, setMap] = useState<any>(null);
   // deno-lint-ignore no-explicit-any
   const [infoWindow, setInfoWindow] = useState<any>(null);
+  const [addingChangingRoom, setAddingChangingRoom] = useState<
+    // deno-lint-ignore no-explicit-any
+    { active: boolean; listener: any }
+  >({ active: false, listener: null });
 
   useEffect(() => {
     const load = async () => {
@@ -106,10 +110,53 @@ export default function MyMap(props: MapProps) {
     );
   };
 
+  const startAddingChangingRoom = () => {
+    // deno-lint-ignore no-explicit-any
+    const listener = map.addListener("click", (evt: any) => {
+      const lat = evt.latLng.lat();
+      const lng = evt.latLng.lng();
+      infoWindow.setContent(
+        `<div>
+           <h3 class="${tw`text-md font-bold`}">Nytt stellerom</h3>
+           <p>
+             Klikk på &quot;Fortsett&quot; om du er fornøyd med plasseringen.
+           </p>
+            <a href="/new-room?lat=${lat}&lng=${lng}">
+           <button class="${tw
+          `bg-gray-300 p-2 rounded-md border border-gray-700`}">
+          Fortsett
+          </button>
+          </a>
+         </div>`,
+      );
+      infoWindow.setPosition({ lat, lng });
+      infoWindow.open(map);
+    });
+    setAddingChangingRoom({ active: true, listener });
+    console.info("Listening for clicks for adding changing room");
+  };
+
+  const stopAddingChangingRoom = () => {
+    google!.maps.event.removeListener(addingChangingRoom.listener);
+    console.info("Removed click listener for adding changing rooms");
+
+    if (infoWindow.open) {
+      infoWindow.close();
+    }
+
+    setAddingChangingRoom({ active: false, listener: null });
+  };
+
+  const infoMsg = map === null
+    ? "Laster kart..."
+    : addingChangingRoom
+    ? "Legg til stellerom - plasser rommet på kartet"
+    : "Finn og anmeld stellerom";
+
   return (
     <div>
+      <p>{infoMsg}</p>
       <div ref={mapDiv} class={tw`w-full h-96`}>
-        {map === null && <p>Laster kart...</p>}
       </div>
       <button
         class={tw
@@ -119,6 +166,25 @@ export default function MyMap(props: MapProps) {
       >
         Gå til min plassering
       </button>
+      {addingChangingRoom.active && (
+            <button
+              class={tw
+                `inline-block bg-yellow-400 p-2 rounded-md border border-gray-700`}
+              type="button"
+              onClick={stopAddingChangingRoom}
+            >
+              Avbryt legg til stellerom
+            </button>
+          ) || (
+        <button
+          class={tw
+            `inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
+          type="button"
+          onClick={startAddingChangingRoom}
+        >
+          Legg til nytt stellerom
+        </button>
+      )}
     </div>
   );
 }

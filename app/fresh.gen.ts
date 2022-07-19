@@ -4,12 +4,14 @@
 
 import * as $0 from "./routes/about.tsx";
 import * as $1 from "./routes/index.tsx";
+import * as $2 from "./routes/new-room.tsx";
 import * as $$0 from "./islands/Map.tsx";
 
 const manifest = {
   routes: {
     "./routes/about.tsx": $0,
     "./routes/index.tsx": $1,
+    "./routes/new-room.tsx": $2,
   },
   islands: {
     "./islands/Map.tsx": $$0,

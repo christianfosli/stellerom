@@ -32,18 +32,13 @@ export default function Home() {
       <main>
         <Map apiKey={googleMapsApiKey} changingRooms={mockChangingRooms} />
       </main>
-      <aside class={tw`p-2`}>
-        <p>
-          Finn og anmeld stellerom.{" "}
-          <a class={tw`text-blue-700`} href="/about">Mer info</a>.
-        </p>
-      </aside>
       <aside class={tw`bg-red-300 my-4 p-2`}>
         <p>
           <b>Advarsel</b>: Utvikling har såvidt startet og siden er ikke enda
           funksjonell
         </p>
       </aside>
+      <a class={tw`text-blue-700`} href="/about">Mer info</a>.
     </div>
   );
 }
