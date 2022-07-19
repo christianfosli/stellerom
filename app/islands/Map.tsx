@@ -47,21 +47,31 @@ export default function MyMap(props: MapProps) {
       return;
     }
 
-    const m = new google.maps.Map(mapDiv.current, {
+    const mp = new google.maps.Map(mapDiv.current, {
       center: centerOfNorway,
       zoom: defaultZoom,
     });
+    const iw = new google!.maps.InfoWindow();
+
+    setMap(mp);
+    setInfoWindow(iw);
 
     const roomMarkers = props.changingRooms.map((r) => {
-      return new google.maps.Marker({
+      const mark = new google.maps.Marker({
         position: r.location,
-        label: r.name,
         // TODO: We can add a custom icon resembling a changing room here
-        map: m,
+        map: mp,
       });
-    });
 
-    setMap(m);
+      mark.addListener("click", () => {
+        iw.setContent(
+          `<h3 class="${tw`text-md font-bold`}">${r.name}</h3>`,
+        );
+        iw.open(mp, mark);
+      });
+
+      return mark;
+    });
 
     console.info(
       `Map of ${props.changingRooms.length} rooms rendered`,
@@ -84,19 +94,13 @@ export default function MyMap(props: MapProps) {
           `Got current location ${JSON.stringify(position)} from browser`,
         );
 
-        if (infoWindow !== null) {
-          infoWindow.setMap(null);
-        }
-
-        const iw = new google!.maps.InfoWindow({
-          content: `<h3 class="${tw`text-md font-bold`}">Du er her</h3>`,
-          position,
-        });
-
+        infoWindow.setPosition(position);
+        infoWindow.setContent(
+          `<h3 class="${tw`text-md font-bold`}">Du er her</h3>`,
+        );
         map.setCenter(position);
         map.setZoom(17);
-        iw.open(map);
-        setInfoWindow(iw);
+        infoWindow.open(map);
       },
       (error) => console.error(error),
     );
