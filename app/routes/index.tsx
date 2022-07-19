@@ -28,17 +28,22 @@ export default function Home() {
     <div class={tw`p-4 mx-auto max-w-screen-md`}>
       <header>
         <h1 class={tw`text-xl font-light`}>Stellerom.no</h1>
-        <p>Finn og anmeld stellerom i nærheten</p>
       </header>
       <main>
         <Map apiKey={googleMapsApiKey} changingRooms={mockChangingRooms} />
-        <div class={tw`bg-red-300 my-4 p-2`}>
-          <p>
-            <b>Advarsel</b>: Utvikling har såvidt startet og siden er ikke enda
-            funksjonell
-          </p>
-        </div>
       </main>
+      <aside class={tw`p-2`}>
+        <p>
+          Finn og anmeld stellerom.{" "}
+          <a class={tw`text-blue-700`} href="/about">Mer info</a>.
+        </p>
+      </aside>
+      <aside class={tw`bg-red-300 my-4 p-2`}>
+        <p>
+          <b>Advarsel</b>: Utvikling har såvidt startet og siden er ikke enda
+          funksjonell
+        </p>
+      </aside>
     </div>
   );
 }
