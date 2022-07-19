@@ -58,20 +58,21 @@ export default function MyMap(props: MapProps) {
 
   const showCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      (position) => {
-        console.info("Got current location from browser");
-
-        const pos = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
+      (navPosition) => {
+        const position = {
+          lat: navPosition.coords.latitude,
+          lng: navPosition.coords.longitude,
         };
+        console.info(
+          `Got current location ${JSON.stringify(position)} from browser`,
+        );
 
-        const infoWindow = new google!.maps.InfoWindow();
-        infoWindow.setPosition(pos);
-        infoWindow.setContent("Du er her");
-        infoWindow.open(map);
+        new google!.maps.InfoWindow({
+          content: `<h3 class="${tw`text-md font-bold`}">Du er her</h3>`,
+          position,
+        }).open(map);
 
-        map.setCenter(pos);
+        map.setCenter(position);
         map.setZoom(17);
       },
       (error) => console.error(error),
