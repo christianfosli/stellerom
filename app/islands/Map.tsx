@@ -16,13 +16,15 @@ const defaultZoom = 4;
 export default function MyMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
-  // loaded by js-api-loader, I counldn't find out how to get type for typescript
+  // I couldn't figure out how to get objects loaded by Google Maps JavaScript API
+  // into TypeScript types. Therefore some `any`'s below...
+
   // deno-lint-ignore no-explicit-any
   const [google, setGoogle] = useState<Record<string, any> | null>(null);
-
-  // map type from google maps API. I couldn't figure out how to get type into typescript
   // deno-lint-ignore no-explicit-any
   const [map, setMap] = useState<any>(null);
+  // deno-lint-ignore no-explicit-any
+  const [infoWindow, setInfoWindow] = useState<any>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -82,13 +84,19 @@ export default function MyMap(props: MapProps) {
           `Got current location ${JSON.stringify(position)} from browser`,
         );
 
-        new google!.maps.InfoWindow({
+        if (infoWindow !== null) {
+          infoWindow.setMap(null);
+        }
+
+        const iw = new google!.maps.InfoWindow({
           content: `<h3 class="${tw`text-md font-bold`}">Du er her</h3>`,
           position,
-        }).open(map);
+        });
 
         map.setCenter(position);
         map.setZoom(17);
+        iw.open(map);
+        setInfoWindow(iw);
       },
       (error) => console.error(error),
     );
