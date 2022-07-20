@@ -149,7 +149,7 @@ export default function MyMap(props: MapProps) {
 
   const infoMsg = map === null
     ? "Laster kart..."
-    : addingChangingRoom
+    : addingChangingRoom.active
     ? "Legg til stellerom - plasser rommet på kartet"
     : "Finn og anmeld stellerom";
 
