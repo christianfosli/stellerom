@@ -1,0 +1,98 @@
+name: room-api-cicd
+
+on:
+  push:
+    paths:
+      - room-api/**
+      - .github/workflows/room-api.yaml
+      - scripts/az-bootstrap-containerapp.bash
+
+permissions:
+  # required for federated credentials to access azure
+  id-token: write
+  # required for federated credentials to access azure
+  contents: read
+  # required to push to ghcr
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to ghcr
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: |
+          tags="-t ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }}"
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            printf 'Banch is main! Tagging with latest\n'
+            tags="$tags -t ghcr.io/christianfosli/stellerom/room-api:latest"
+          fi
+          cd room-api
+          docker build $tags .
+        env:
+          DOCKER_BUILDKIT: "1"
+
+      - name: Push
+        run: |
+          docker push --all-tags ghcr.io/christianfosli/stellerom/room-api
+
+  deploy_dev:
+    needs: build
+    runs-on: ubuntu-22.04
+    environment: Development
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZ_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZ_TENANT_ID }}
+          subscription-id: ${{ secrets.AZ_SUBS_ID }}
+
+      - name: Infra
+        run: ./scripts/az-bootstrap-containerapp.bash
+        env:
+          ENVIRONMENT: dev
+          SERVICE_NAME: room-api
+          TARGET_PORT: 3000
+
+      - name: Deploy
+        run: |
+          az containerapp update -n capp-stellerom-room-api-dev -g rg-stellerom-dev \
+            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }}
+
+  deploy_prod:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy_dev
+    runs-on: ubuntu-22.04
+    environment: Production
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Azure login
+        uses: azure/login@v1
+        with:
+          client-id: ${{ secrets.AZ_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZ_TENANT_ID }}
+          subscription-id: ${{ secrets.AZ_SUBS_ID }}
+
+      - name: Infra
+        run: ./scripts/az-bootstrap-containerapp.bash
+        env:
+          ENVIRONMENT: prod
+          SERVICE_NAME: room-api
+          TARGET_PORT: 3000
+
+      - name: Deploy
+        run: |
+          az containerapp update -n capp-stellerom-room-api-prod -g rg-stellerom-prod \
+            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }}
