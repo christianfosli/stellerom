@@ -155,7 +155,13 @@ export default function MyMap(props: MapProps) {
 
   return (
     <div>
-      <p>{infoMsg}</p>
+      <p
+        class={tw`transition-color ease-in-out duration-200 ${
+          addingChangingRoom.active ? "bg-yellow-200" : "bg-transparent"
+        }`}
+      >
+        {infoMsg}
+      </p>
       <div ref={mapDiv} class={tw`w-full h-96`}>
       </div>
       <button
