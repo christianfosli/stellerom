@@ -10,9 +10,9 @@ interface NewRoomData {
   submit: "SUCCESS" | { failureReason: string } | null;
 }
 
-function parseIntOrUndefined(x: string | undefined | null) {
+function parseFloatOrUndefined(x: string | undefined | null) {
   if (x) {
-    const parsed = parseInt(x);
+    const parsed = parseFloat(x);
     if (isNaN(parsed)) {
       return undefined;
     }
@@ -24,8 +24,8 @@ function parseIntOrUndefined(x: string | undefined | null) {
 export const handler: Handlers<NewRoomData> = {
   GET(req, ctx) {
     const url = new URL(req.url);
-    const lat = parseIntOrUndefined(url.searchParams.get("lat"));
-    const lng = parseIntOrUndefined(url.searchParams.get("lng"));
+    const lat = parseFloatOrUndefined(url.searchParams.get("lat"));
+    const lng = parseFloatOrUndefined(url.searchParams.get("lng"));
     return ctx.render({ method: "GET", get: { lat, lng }, submit: null });
   },
   POST(req, ctx) {
