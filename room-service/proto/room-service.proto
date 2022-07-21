@@ -1,0 +1,31 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+package room_service;
+
+service RoomService {
+  rpc GetRooms (GetRoomsRequest) returns (GetRoomsReply);
+  rpc AddRoom (AddRoomRequest) returns (google.protobuf.Empty);
+}
+
+message GetRoomsRequest {
+}
+
+message GetRoomsReply {
+  repeated ChangingRoom rooms = 1;
+}
+
+message AddRoomRequest {
+  string name = 1;
+  Location location = 2;
+}
+
+message ChangingRoom {
+  string id = 1;
+  string name = 2;
+  Location location = 3;
+}
+
+message Location {
+  double lat = 1;
+  double lng = 2;
+}
