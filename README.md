@@ -7,4 +7,10 @@ Visit [https://www.stellerom.no](https://www.stellerom.no) to see it live.
 
 ## Development
 
-See instructions inside the app folder.
+### Run locally with docker compose
+
+//TODO
+
+### Run locally without Docker
+
+See instructions inside the folder for the service you want to work on.

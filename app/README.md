@@ -5,6 +5,8 @@ Made with [Deno's Fresh framework](https://fresh.deno.dev/) and deployed using D
 
 ### Running locally
 
+Install Deno if needed.
+
 Set required environment variable(s):
 
 ```
