@@ -67,8 +67,16 @@ jobs:
 
       - name: Deploy
         run: |
+          set -eo pipefail
+        
+          az containerapp secret set -n capp-stellerom-room-api-dev -g rg-stellerom-dev \
+            --secrets "db-connstr=$DB_CONNSTR"
+
           az containerapp update -n capp-stellerom-room-api-dev -g rg-stellerom-dev \
-            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }}
+            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }} \
+            --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-dev"
+        env:
+          DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
 
   deploy_prod:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -94,5 +102,11 @@ jobs:
 
       - name: Deploy
         run: |
+          az containerapp secret set -n capp-stellerom-room-api-prod -g rg-stellerom-prod \
+            --secrets "db-connstr=$DB_CONNSTR"
+
           az containerapp update -n capp-stellerom-room-api-prod -g rg-stellerom-prod \
-            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }}
+            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }} \
+            --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-prod"
+        env:
+          DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
