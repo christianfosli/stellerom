@@ -19,7 +19,7 @@ jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Login to ghcr
         uses: docker/login-action@v2
@@ -49,7 +49,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment: Development
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Azure login
         uses: azure/login@v1
@@ -74,6 +74,7 @@ jobs:
 
           az containerapp update -n capp-stellerom-room-api-dev -g rg-stellerom-dev \
             --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }} \
+            --min-replicas 0 --max-replicas 2 \
             --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-dev"
         env:
           DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
@@ -84,7 +85,7 @@ jobs:
     runs-on: ubuntu-22.04
     environment: Production
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Azure login
         uses: azure/login@v1
@@ -107,6 +108,7 @@ jobs:
 
           az containerapp update -n capp-stellerom-room-api-prod -g rg-stellerom-prod \
             --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }} \
+            --min-replicas 1 --max-replicas 5 \
             --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-prod"
         env:
           DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
