@@ -3,6 +3,7 @@
 import { Fragment, h } from "preact";
 import { tw } from "@twind";
 import { Handlers, PageProps } from "$fresh/server.ts";
+import Header from "../utils/Header.tsx";
 
 interface NewRoomData {
   method: "GET" | "POST";
@@ -154,11 +155,7 @@ export default function NewRoom({ data }: PageProps<NewRoomData>) {
 
   return (
     <div class={tw`p-4 mx-auto max-w-screen-md`}>
-      <header>
-        <a href="/">
-          <h1 class={tw`text-xl font-light`}>Stellerom.no</h1>
-        </a>
-      </header>
+      <Header />
       <main>
         <h2 class={tw`text-lg font-bold`}>Legg til nytt stellerom</h2>
         {renderMainContent()}

@@ -3,6 +3,7 @@ import { h } from "preact";
 import { tw } from "@twind";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Map from "../islands/Map.tsx";
+import Header from "../utils/Header.tsx";
 
 export interface ChangingRoom {
   id: string;
@@ -31,9 +32,7 @@ export const handler: Handlers<ChangingRoom[]> = {
 export default function Home({ data }: PageProps<ChangingRoom[]>) {
   return (
     <div class={tw`p-4 mx-auto max-w-screen-md`}>
-      <header>
-        <h1 class={tw`text-xl font-light`}>Stellerom.no</h1>
-      </header>
+      <Header />
       <main>
         <Map apiKey={googleMapsApiKey} changingRooms={data} />
       </main>
