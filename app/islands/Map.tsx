@@ -69,7 +69,18 @@ export default function MyMap(props: MapProps) {
 
       mark.addListener("click", () => {
         iw.setContent(
-          `<h3 class="${tw`text-md font-bold`}">${r.name}</h3>`,
+          `<div>
+            <h3 class="${tw`text-md font-bold`}">${r.name}</h3>
+            <p class="${tw`text-sm max-w-sm`}">
+              Her skal ett sammendrag av anmeldelser vise.
+              Meeeen det er ikke implementert helt enda.
+            </p>
+            <a href="/rooms/${r.id}">
+              <button class="${tw`bg-gray-300 p-2 rounded-md border border-gray-700`}">
+                Gå til rom
+              </button>
+            </a>
+          </div>`,
         );
         iw.open(mp, mark);
       });
@@ -122,8 +133,7 @@ export default function MyMap(props: MapProps) {
              Klikk på &quot;Fortsett&quot; om du er fornøyd med plasseringen.
            </p>
             <a href="/new-room?lat=${lat}&lng=${lng}">
-           <button class="${tw
-          `bg-gray-300 p-2 rounded-md border border-gray-700`}">
+           <button class="${tw`bg-gray-300 p-2 rounded-md border border-gray-700`}">
           Fortsett
           </button>
           </a>
@@ -165,8 +175,7 @@ export default function MyMap(props: MapProps) {
       <div ref={mapDiv} class={tw`w-full h-96`}>
       </div>
       <button
-        class={tw
-          `inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
+        class={tw`inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
         type="button"
         onClick={showCurrentLocation}
       >
@@ -174,8 +183,7 @@ export default function MyMap(props: MapProps) {
       </button>
       {addingChangingRoom.active && (
             <button
-              class={tw
-                `inline-block bg-yellow-400 p-2 rounded-md border border-gray-700`}
+              class={tw`inline-block bg-yellow-400 p-2 rounded-md border border-gray-700`}
               type="button"
               onClick={stopAddingChangingRoom}
             >
@@ -183,8 +191,7 @@ export default function MyMap(props: MapProps) {
             </button>
           ) || (
         <button
-          class={tw
-            `inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
+          class={tw`inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
           type="button"
           onClick={startAddingChangingRoom}
         >
