@@ -37,12 +37,6 @@ export default function Home({ data }: PageProps<ChangingRoom[]>) {
       <main>
         <Map apiKey={googleMapsApiKey} changingRooms={data} />
       </main>
-      <aside class={tw`bg-red-300 my-4 p-2`}>
-        <p>
-          <b>Advarsel</b>: Utvikling har såvidt startet og siden er ikke enda
-          funksjonell
-        </p>
-      </aside>
       <a class={tw`text-blue-700`} href="/about">Mer info</a>.
     </div>
   );
