@@ -11,8 +11,6 @@ A hobby project to try out some new technology :smile:
 | Production  | [https://www.stellerom.no](https://www.stellerom.no) |
 | Development | [https://dev.stellerom.no](https://dev.stellerom.no) |
 
-Visit [https://www.stellerom.no](https://www.stellerom.no) to see it live.
-
 ## Development
 
 ### Run locally with docker compose
