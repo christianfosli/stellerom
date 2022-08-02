@@ -8,9 +8,14 @@ use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use tower_http::cors::CorsLayer;
 
+use crate::create_review::create_review;
+use crate::get_reviews::get_reviews;
 use crate::healthcheck::{live, ready};
 
+mod create_review;
+mod get_reviews;
 mod healthcheck;
+mod models;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,6 +26,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let app = Router::new()
         .route("/readyz", routing::get(ready))
         .route("/livez", routing::get(live))
+        .route("/reviews", routing::post(create_review))
+        .route("/reviews", routing::get(get_reviews))
         .layer(Extension(db))
         .layer(
             CorsLayer::new()
