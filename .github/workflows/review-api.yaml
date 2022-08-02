@@ -1,10 +1,10 @@
-name: room-api-cicd
+name: review-api-cicd
 
 on:
   push:
     paths:
-      - room-api/**
-      - .github/workflows/room-api.yaml
+      - review-api/**
+      - .github/workflows/review-api.yaml
       - scripts/az-bootstrap-containerapp.bash
 
 permissions:
@@ -30,19 +30,19 @@ jobs:
 
       - name: Build
         run: |
-          tags="-t ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }}"
+          tags="-t ghcr.io/christianfosli/stellerom/review-api:${{ github.sha }}"
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             printf 'Banch is main! Tagging with latest\n'
-            tags="$tags -t ghcr.io/christianfosli/stellerom/room-api:latest"
+            tags="$tags -t ghcr.io/christianfosli/stellerom/review-api:latest"
           fi
-          cd room-api
+          cd review-api
           docker build $tags .
         env:
           DOCKER_BUILDKIT: "1"
 
       - name: Push
         run: |
-          docker push --all-tags ghcr.io/christianfosli/stellerom/room-api
+          docker push --all-tags ghcr.io/christianfosli/stellerom/review-api
 
   deploy_dev:
     needs: build
@@ -62,22 +62,22 @@ jobs:
         run: ./scripts/az-bootstrap-containerapp.bash
         env:
           ENVIRONMENT: dev
-          SERVICE_NAME: room-api
-          TARGET_PORT: 3000
+          SERVICE_NAME: review-api
+          TARGET_PORT: 3001
 
       - name: Deploy
         run: |
           set -eo pipefail
 
-          az containerapp secret set -n capp-stellerom-room-api-dev -g rg-stellerom-dev \
+          az containerapp secret set -n capp-stellerom-review-api-dev -g rg-stellerom-dev \
             --secrets "db-connstr=$DB_CONNSTR"
 
-          az containerapp update -n capp-stellerom-room-api-dev -g rg-stellerom-dev \
-            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }} \
+          az containerapp update -n capp-stellerom-review-api-dev -g rg-stellerom-dev \
+            --image ghcr.io/christianfosli/stellerom/review-api:${{ github.sha }} \
             --min-replicas 0 --max-replicas 2 \
-            --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-dev"
+            --set-env-vars "REVIEW_API_DB_CONNSTR=secretref:db-connstr" "REVIEW_API_DB_NAME=review-api-dev"
         env:
-          DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
+          DB_CONNSTR: "mongodb+srv://${{ secrets.REVIEW_API_DB_USERNAME }}:${{ secrets.REVIEW_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
 
   deploy_prod:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -98,17 +98,17 @@ jobs:
         run: ./scripts/az-bootstrap-containerapp.bash
         env:
           ENVIRONMENT: prod
-          SERVICE_NAME: room-api
-          TARGET_PORT: 3000
+          SERVICE_NAME: review-api
+          TARGET_PORT: 3001
 
       - name: Deploy
         run: |
-          az containerapp secret set -n capp-stellerom-room-api-prod -g rg-stellerom-prod \
+          az containerapp secret set -n capp-stellerom-review-api-prod -g rg-stellerom-prod \
             --secrets "db-connstr=$DB_CONNSTR"
 
-          az containerapp update -n capp-stellerom-room-api-prod -g rg-stellerom-prod \
-            --image ghcr.io/christianfosli/stellerom/room-api:${{ github.sha }} \
+          az containerapp update -n capp-stellerom-review-api-prod -g rg-stellerom-prod \
+            --image ghcr.io/christianfosli/stellerom/review-api:${{ github.sha }} \
             --min-replicas 1 --max-replicas 5 \
-            --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-prod"
+            --set-env-vars "REVIEW_API_DB_CONNSTR=secretref:db-connstr" "REVIEW_API_DB_NAME=review-api-prod"
         env:
-          DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
+          DB_CONNSTR: "mongodb+srv://${{ secrets.REVIEW_API_DB_USERNAME }}:${{ secrets.REVIEW_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
