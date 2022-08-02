@@ -1,10 +1,12 @@
 use std::env;
 use std::net::SocketAddr;
 
+use axum::http::{self, Method};
 use axum::Server;
 use axum::{routing, Extension, Router};
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
+use tower_http::cors::CorsLayer;
 
 use crate::create_room::create_room;
 use crate::delete_room::delete_room;
@@ -37,7 +39,18 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/rooms/:id", routing::get(get_room_by_id))
         .route("/rooms/:id", routing::put(update_room))
         .route("/rooms/:id", routing::delete(delete_room))
-        .layer(Extension(db));
+        .layer(Extension(db))
+        .layer(
+            CorsLayer::new()
+                .allow_origin([
+                    // adding frontend app for all environments for simplicity
+                    "http://localhost:8000".parse()?,
+                    "https://dev.stellerom.no".parse()?,
+                    "https://www.stellerom.no".parse()?,
+                ])
+                .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
+                .allow_headers([http::header::CONTENT_TYPE]),
+        );
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::info!("Service started. Listening on {}", addr);
