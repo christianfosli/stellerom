@@ -1,15 +1,9 @@
+use bounded_integer::BoundedU8;
 use chrono::prelude::*;
 use mongodb::bson::Uuid;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq)]
-pub enum StarRating {
-    One,
-    Two,
-    Three,
-    Four,
-    Five,
-}
+pub type StarRating = BoundedU8<1, 5>;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Review {
