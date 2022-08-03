@@ -5,12 +5,13 @@ use mongodb::{
 };
 use serde::Deserialize;
 
-use crate::{models::ChangingRoom, simple_types::Location};
+use crate::models::{ChangingRoom, Location, Ratings};
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct UpdateChangingRoom {
     pub name: String,
     pub location: Location,
+    pub ratings: Option<Ratings>,
 }
 
 pub async fn update_room(
@@ -35,6 +36,7 @@ pub async fn update_room(
                 id,
                 name: payload.name,
                 location: payload.location,
+                ratings: payload.ratings,
             },
             None,
         )

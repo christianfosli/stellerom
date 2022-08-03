@@ -19,7 +19,6 @@ mod delete_room;
 mod get_rooms;
 mod healthcheck;
 mod models;
-mod simple_types;
 mod update_room;
 
 #[macro_use]

@@ -2,7 +2,7 @@ use axum::{http::StatusCode, Extension, Json};
 use mongodb::{bson::Uuid, Database};
 use serde::Deserialize;
 
-use crate::{models::ChangingRoom, simple_types::Location};
+use crate::models::{ChangingRoom, Location};
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct CreateChangingRoom {
@@ -20,6 +20,7 @@ pub async fn create_room(
         id: Uuid::new(),
         name: payload.name,
         location: payload.location,
+        ratings: None,
     };
 
     collection.insert_one(&created, None).await.map_err(|e| {

@@ -106,6 +106,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bounded-integer"
+version = "0.5.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aa1cf2ba51439a5e5108672f8004c29924ec5999f79070d59ee54e0c7b7f9948"
+dependencies = [
+ "serde",
+]
+
+[[package]]
 name = "bson"
 version = "2.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -950,6 +959,7 @@ name = "room-api"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "bounded-integer",
  "futures",
  "lazy_static",
  "mongodb",
