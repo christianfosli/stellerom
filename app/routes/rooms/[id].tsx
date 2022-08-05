@@ -45,13 +45,20 @@ export default function Room(
     <div class={tw`p-4 mx-auto max-w-screen-md`}>
       <Header />
       <main>
-        <h2 class={tw`text-lg font-bold`}>Rom {data.name}</h2>
+        <h2 class={tw`text-lg font-bold`}>{data.name}</h2>
+        <ul class={tw`list-none py-2 text-md`}>
+          <li>Tilgjengelighet {data.ratings?.availability ?? "?"}/5</li>
+          <li>Sikkerhet {data.ratings?.safety ?? "?"}/5</li>
+          <li>Renslighet {data.ratings?.cleanliness ?? "?"}/5</li>
+        </ul>
+        <h3 class={tw`text-md font-bold`}>Anmeldelser</h3>
         <p>
           Her skal man kunne se over anmeldelser, og anmelde rommet selv. Meeen
           det er ikke implementert helt enda.
         </p>
+        <h3 class={tw`text-md font-bold`}>Administrer rom</h3>
+        <EditRoom room={data} apiUrl={roomApiUrl} />
       </main>
-      <EditRoom room={data} apiUrl={roomApiUrl} />
     </div>
   );
 }

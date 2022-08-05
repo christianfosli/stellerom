@@ -5,12 +5,6 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import Map from "../islands/Map.tsx";
 import Header from "../utils/Header.tsx";
 
-export interface ChangingRoom {
-  id: string;
-  name: string | undefined | null;
-  location: { lat: number; lng: number };
-}
-
 const googleMapsApiKey = Deno.env.get("GOOGLE_MAPS_API_KEY") ?? (() => {
   throw new Error("GOOGLE_MAPS_API_KEY was not set but is required");
 })();

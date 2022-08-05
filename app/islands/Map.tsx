@@ -71,10 +71,15 @@ export default function MyMap(props: MapProps) {
         iw.setContent(
           `<div>
             <h3 class="${tw`text-md font-bold`}">${r.name}</h3>
-            <p class="${tw`text-sm max-w-sm`}">
-              Her skal ett sammendrag av anmeldelser vise.
-              Meeeen det er ikke implementert helt enda.
-            </p>
+            ${
+            r.ratings
+              ? `<ul class="${tw`max-w-sm list-none py-2 text-sm`}">
+                  <li>Tilgjengelighet ${r.ratings.availability}/5</li>
+                  <li>Sikkerhet ${r.ratings.safety}/5</li>
+                  <li>Renslighet ${r.ratings.cleanliness}/5</li>
+                </ul>`
+              : `<p class="${tw`text-sm max-w-sm`}">Ingen anmeldelser enda..</p>`
+          }
             <a href="/rooms/${r.id}">
               <button class="${tw`bg-gray-300 p-2 rounded-md border border-gray-700`}">
                 Gå til rom
