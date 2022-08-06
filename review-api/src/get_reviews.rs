@@ -10,7 +10,7 @@ use crate::models::Review;
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Params {
-    #[serde(rename = "room-id")]
+    #[serde(rename = "roomId")]
     room_id: Option<String>,
 }
 

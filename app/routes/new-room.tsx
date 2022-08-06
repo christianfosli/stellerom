@@ -71,7 +71,7 @@ function renderForm(data: NewRoomData) {
   return (
     <form
       method="POST"
-      class={tw`rounded shadow-md p-5`}
+      class={tw`rounded shadow-md p-5 w-full`}
     >
       <label class={tw`block text-md font-bold`} for="name">Navn</label>
       <input

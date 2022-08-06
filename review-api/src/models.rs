@@ -9,8 +9,6 @@ pub type StarRating = BoundedU8<1, 5>;
 pub struct Review {
     #[serde(rename = "roomId")]
     pub room_id: Uuid,
-    #[serde(rename = "reviewedAt")]
-    pub reviewed_at: DateTime<Utc>,
     #[serde(rename = "availabilityRating")]
     pub availability_rating: StarRating,
     #[serde(rename = "safetyRating")]
@@ -18,4 +16,8 @@ pub struct Review {
     #[serde(rename = "cleanlinessRating")]
     pub cleanliness_rating: StarRating,
     pub review: Option<String>,
+    #[serde(rename = "reviewedAt")]
+    pub reviewed_at: DateTime<Utc>,
+    #[serde(rename = "reviewedBy")]
+    pub reviewed_by: Option<String>,
 }
