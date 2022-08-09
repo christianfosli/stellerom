@@ -1,7 +1,7 @@
 /** @jsx h */
 import { h } from "preact";
 import { tw } from "@twind";
-import { ChangingRoom } from "../routes/index.tsx";
+import { ChangingRoom } from "../utils/models.ts";
 
 interface EditRoomProps {
   room: ChangingRoom;

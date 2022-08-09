@@ -3,7 +3,7 @@ import { h } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { tw } from "@twind";
 import { Loader } from "@googlemaps/js-api-loader";
-import { ChangingRoom } from "../routes/index.tsx";
+import { ChangingRoom } from "../utils/models.ts";
 
 interface MapProps {
   apiKey: string;
