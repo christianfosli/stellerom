@@ -12,6 +12,7 @@ interface MapProps {
 
 const centerOfNorway = { lat: 64.68, lng: 9.39 };
 const defaultZoom = 4;
+const localStorageMapPosKey = "mapPosition";
 
 export default function MyMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
@@ -31,6 +32,7 @@ export default function MyMap(props: MapProps) {
   >({ active: false, listener: null });
 
   useEffect(() => {
+    // Load google maps JS API
     const load = async () => {
       const loader = new Loader({
         apiKey: props.apiKey,
@@ -47,14 +49,23 @@ export default function MyMap(props: MapProps) {
   }, [props.apiKey]);
 
   useEffect(() => {
+    // Initial render of google maps map
+
     if (google === null) {
       return;
     }
 
-    const mp = new google.maps.Map(mapDiv.current, {
-      center: centerOfNorway,
-      zoom: defaultZoom,
-    });
+    const lastMapPos = localStorage.getItem(localStorageMapPosKey);
+    console.info(`mapPosition loaded from localStorage: ${lastMapPos}`);
+
+    const { center, zoom }: {
+      center: { lat: number; lng: number };
+      zoom: number;
+    } = lastMapPos
+      ? JSON.parse(lastMapPos)
+      : { center: centerOfNorway, zoom: defaultZoom };
+
+    const mp = new google.maps.Map(mapDiv.current, { center, zoom });
     const iw = new google!.maps.InfoWindow();
 
     setMap(mp);
@@ -102,6 +113,21 @@ export default function MyMap(props: MapProps) {
       setMap(null);
     };
   }, [google, props.changingRooms]);
+
+  useEffect(() => {
+    if (map === null || map === undefined) return;
+
+    const storeMapPos = () => {
+      const { center, zoom } = map;
+      localStorage.setItem(
+        localStorageMapPosKey,
+        JSON.stringify({ center, zoom }),
+      );
+    };
+
+    const timerId = setInterval(storeMapPos, 2000);
+    return () => clearInterval(timerId);
+  }, [map]);
 
   const showCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition(
