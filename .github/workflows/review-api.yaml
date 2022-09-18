@@ -6,6 +6,7 @@ on:
       - review-api/**
       - .github/workflows/review-api.yaml
       - scripts/az-bootstrap-containerapp.bash
+  workflow_dispatch:
 
 permissions:
   # required for federated credentials to access azure
