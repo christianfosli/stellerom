@@ -16,6 +16,8 @@ pub struct Review {
     #[serde(rename = "cleanlinessRating")]
     pub cleanliness_rating: StarRating,
     pub review: Option<String>,
+    #[serde(rename = "imageUrl")]
+    pub image_url: Option<String>,
     #[serde(rename = "reviewedAt")]
     pub reviewed_at: DateTime<Utc>,
     #[serde(rename = "reviewedBy")]

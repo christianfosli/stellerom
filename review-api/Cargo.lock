@@ -1156,6 +1156,7 @@ dependencies = [
  "bounded-integer",
  "chrono",
  "futures",
+ "lazy_static",
  "mongodb",
  "reqwest",
  "serde",

@@ -10,6 +10,7 @@ axum = "0.5"
 bounded-integer = { version = "0.5", features = ["std", "types", "serde1"] }
 chrono = { version = "0.4", features = ["serde"] }
 futures = "0.3"
+lazy_static = "1.4.0"
 mongodb = "2"
 reqwest = { version = "0.11.11", features = ["json"] }
 serde = { version = "1", features = ["derive"] }

@@ -12,6 +12,12 @@ use std::env;
 
 use crate::models::{Review, StarRating};
 
+lazy_static! {
+    static ref ALLOWED_IMAGE_BASE_URLS: Vec<String> =
+        serde_json::from_str(&env::var("ALLOWED_IMAGE_BASE_URLS").unwrap_or("[]".to_owned()))
+            .unwrap();
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct CreateReview {
     #[serde(rename = "roomId")]
@@ -23,6 +29,8 @@ pub struct CreateReview {
     #[serde(rename = "cleanlinessRating")]
     pub cleanliness_rating: StarRating,
     pub review: Option<String>,
+    #[serde(rename = "imageUrl")]
+    pub image_url: Option<String>,
     #[serde(rename = "reviewedBy")]
     pub reviewed_by: Option<String>,
 }
@@ -31,6 +39,8 @@ pub async fn create_review(
     Json(payload): Json<CreateReview>,
     Extension(db): Extension<Database>,
 ) -> Result<(StatusCode, Json<Review>), (StatusCode, String)> {
+    validate_payload(&payload)?;
+
     let collection = db.collection::<Review>("reviews");
 
     let review = Review {
@@ -39,6 +49,7 @@ pub async fn create_review(
         safety_rating: payload.safety_rating,
         cleanliness_rating: payload.cleanliness_rating,
         review: payload.review,
+        image_url: payload.image_url,
         reviewed_by: payload.reviewed_by,
         reviewed_at: Utc::now(),
     };
@@ -65,6 +76,28 @@ pub async fn create_review(
         })?;
 
     Ok((StatusCode::CREATED, Json(review)))
+}
+
+fn validate_payload(payload: &CreateReview) -> Result<(), (StatusCode, String)> {
+    if payload.image_url.is_some()
+        && ALLOWED_IMAGE_BASE_URLS
+            .iter()
+            .any(|allowed| !payload.image_url.clone().unwrap().starts_with(allowed))
+    {
+        tracing::error!(
+            url = payload.image_url,
+            "Validation error: Illegal image URL"
+        );
+        return Err((
+            StatusCode::UNPROCESSABLE_ENTITY,
+            format!(
+                "Invalid image url. URL's must start with {:?}",
+                ALLOWED_IMAGE_BASE_URLS.join(",")
+            ),
+        ));
+    } else {
+        Ok(())
+    }
 }
 
 async fn update_room_ratings(
