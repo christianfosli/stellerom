@@ -9,6 +9,8 @@
     "preact-render-to-string": "https://esm.sh/*preact-render-to-string@6.2.0",
     "twind": "https://esm.sh/twind@0.16.19",
     "twind/": "https://esm.sh/twind@0.16.19/",
+    "@azure/storage-blob": "npm:@azure/storage-blob@12",
+    "@azure/identity": "npm:@azure/identity@3",
     "@googlemaps/js-api-loader": "https://cdn.skypack.dev/@googlemaps/js-api-loader@1.16.2?dts",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.1.3",
     "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.2.3"

@@ -1,6 +1,8 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Header from "../utils/Header.tsx";
 import RangeInput from "../islands/RangeInput.tsx";
+import { DefaultAzureCredential } from "@azure/identity";
+import { BlobServiceClient } from "@azure/storage-blob";
 
 interface NewReviewData {
   formData: {
@@ -10,6 +12,7 @@ interface NewReviewData {
     safetyRating?: number;
     cleanlinessRating?: number;
     review?: string;
+    roomImage?: File;
     reviewedBy?: string;
   };
   submitError: { failureReason: string } | null;
@@ -17,6 +20,9 @@ interface NewReviewData {
 
 const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
+
+const blobStoreAccount = Deno.env.get("BLOB_STORE_ACCOUNT") ??
+  "https://ststelleromdev.blob.core.windows.net";
 
 export const handler: Handlers<NewReviewData> = {
   GET(req, ctx) {
@@ -53,6 +59,25 @@ export const handler: Handlers<NewReviewData> = {
       review = undefined;
     }
 
+    const roomImage = formData.get("roomImage") as File | null;
+    let imageUrl = null;
+    if (roomImage) {
+      console.info(
+        `Review includes room image. Preparing upload to ${blobStoreAccount}`,
+      );
+      const credential = new DefaultAzureCredential();
+      const blobClient = new BlobServiceClient(blobStoreAccount, credential);
+      const containerClient = blobClient.getContainerClient(`room-${roomId}`);
+      await containerClient.createIfNotExists();
+      await containerClient.uploadBlockBlob(
+        roomImage.name,
+        roomImage.stream(),
+        roomImage.size,
+      );
+      imageUrl = `${containerClient.url}/${roomImage.name}`;
+      console.info(`Uploaded image to ${imageUrl}.`);
+    }
+
     let reviewedBy = formData.get("reviewedBy")?.valueOf() as
       | string
       | undefined;
@@ -71,6 +96,7 @@ export const handler: Handlers<NewReviewData> = {
         safetyRating,
         cleanlinessRating,
         review,
+        imageUrl,
         reviewedBy,
       }),
     });
@@ -168,6 +194,18 @@ function renderForm(data: NewReviewData) {
         id="reviewText"
         rows={3}
       />
+      <label class="block text-md font-bold" for="roomImage">
+        Last opp bilder (frivillig)
+      </label>
+      <input
+        type="file"
+        id="roomImage"
+        name="roomImage"
+        accept="image/*"
+        capture="environment"
+        multiple={false}
+      />
+
       <label class="block text-md font-bold" for="reviewedBy">
         Ditt navn (frivillig)
       </label>

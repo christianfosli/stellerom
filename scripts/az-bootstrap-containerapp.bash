@@ -33,6 +33,9 @@ else
     --image "ghcr.io/christianfosli/stellerom/$SERVICE_NAME:${GITHUB_SHA:-latest}" \
     --target-port "$TARGET_PORT" \
     --ingress 'external'
+
+  az containerapp identity assign -n "capp-stellerom-$SERVICE_NAME-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT" \
+    --system-assigned
 fi
 
 # Manual Step: Configure CNAME record and validation with domain registrar
@@ -47,4 +50,3 @@ else
   az containerapp hostname bind -n "capp-stellerom-$SERVICE_NAME-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT" \
     --environment "cappenv-stellerom-$ENVIRONMENT" \
     --hostname "$SERVICE_NAME-$ENVIRONMENT.stellerom.no" --validation-method CNAME
-fi
