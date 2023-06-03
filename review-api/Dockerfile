@@ -1,4 +1,4 @@
-FROM rust:1.62 AS builder
+FROM rust:1.69 AS builder
 
 WORKDIR /usr/src/review-api
 COPY . .
