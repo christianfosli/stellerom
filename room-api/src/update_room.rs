@@ -1,4 +1,8 @@
-use axum::{extract::Path, http::StatusCode, Extension, Json};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    Json,
+};
 use mongodb::{
     bson::{doc, Uuid},
     options::{FindOneAndReplaceOptions, ReturnDocument},
@@ -17,8 +21,8 @@ pub struct UpdateChangingRoom {
 
 pub async fn update_room(
     Path(id): Path<String>,
+    State(db): State<Database>,
     Json(payload): Json<UpdateChangingRoom>,
-    Extension(db): Extension<Database>,
 ) -> Result<Json<ChangingRoom>, (StatusCode, String)> {
     let id = Uuid::parse_str(&id).map_err(|e| {
         tracing::error!(err = e.to_string(), "Unable to parse uuid from string");

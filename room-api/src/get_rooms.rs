@@ -1,4 +1,8 @@
-use axum::{extract::Path, http::StatusCode, Extension, Json};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+    Json,
+};
 use futures::TryStreamExt;
 use mongodb::{
     bson::{doc, Uuid},
@@ -15,7 +19,7 @@ lazy_static! {
 }
 
 pub async fn get_all_rooms(
-    Extension(db): Extension<Database>,
+    State(db): State<Database>,
 ) -> Result<Json<Vec<ChangingRoom>>, (StatusCode, String)> {
     let collection = db.collection::<ChangingRoom>("rooms");
 
@@ -38,7 +42,7 @@ pub async fn get_all_rooms(
 
 pub async fn get_room_by_id(
     Path(id): Path<String>,
-    Extension(db): Extension<Database>,
+    State(db): State<Database>,
 ) -> Result<Json<ChangingRoom>, (StatusCode, String)> {
     let id = Uuid::parse_str(&id).map_err(|e| {
         tracing::error!(err = e.to_string(), "Unable to parse uuid from string");

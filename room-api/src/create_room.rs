@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, Extension, Json};
+use axum::{extract::State, http::StatusCode, Json};
 use mongodb::{bson::Uuid, Database};
 use serde::Deserialize;
 
@@ -11,8 +11,8 @@ pub struct CreateChangingRoom {
 }
 
 pub async fn create_room(
+    State(db): State<Database>,
     Json(payload): Json<CreateChangingRoom>,
-    Extension(db): Extension<Database>,
 ) -> Result<(StatusCode, Json<ChangingRoom>), (StatusCode, String)> {
     let collection = db.collection::<ChangingRoom>("rooms");
 

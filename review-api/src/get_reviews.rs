@@ -1,4 +1,8 @@
-use axum::{extract::Query, http::StatusCode, Extension, Json};
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    Json,
+};
 use futures::TryStreamExt;
 use mongodb::{
     bson::{doc, Uuid},
@@ -16,7 +20,7 @@ pub struct Params {
 
 pub async fn get_reviews(
     Query(param): Query<Params>,
-    Extension(db): Extension<Database>,
+    State(db): State<Database>,
 ) -> Result<Json<Vec<Review>>, (StatusCode, String)> {
     let collection = db.collection::<Review>("reviews");
 
@@ -30,7 +34,7 @@ pub async fn get_reviews(
                 StatusCode::UNPROCESSABLE_ENTITY,
                 format!(
                     "Room-id must be a valid uuid but is not. Inner error: {}",
-                    e.to_string()
+                    e
                 ),
             )
         })?

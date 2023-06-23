@@ -1,4 +1,4 @@
-use axum::{http::StatusCode, Extension, Json};
+use axum::{extract::State, http::StatusCode, Json};
 use chrono::Utc;
 use futures::TryStreamExt;
 use mongodb::{
@@ -36,8 +36,8 @@ pub struct CreateReview {
 }
 
 pub async fn create_review(
+    State(db): State<Database>,
     Json(payload): Json<CreateReview>,
-    Extension(db): Extension<Database>,
 ) -> Result<(StatusCode, Json<Review>), (StatusCode, String)> {
     validate_payload(&payload)?;
 
@@ -88,13 +88,13 @@ fn validate_payload(payload: &CreateReview) -> Result<(), (StatusCode, String)> 
             url = payload.image_url,
             "Validation error: Illegal image URL"
         );
-        return Err((
+        Err((
             StatusCode::UNPROCESSABLE_ENTITY,
             format!(
                 "Invalid image url. URL's must start with {:?}",
                 ALLOWED_IMAGE_BASE_URLS.join(",")
             ),
-        ));
+        ))
     } else {
         Ok(())
     }

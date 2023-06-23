@@ -3,7 +3,7 @@ use std::net::SocketAddr;
 
 use axum::http::{self, Method};
 use axum::Server;
-use axum::{routing, Extension, Router};
+use axum::{routing, Router};
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use tower_http::cors::CorsLayer;
@@ -38,7 +38,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/rooms/:id", routing::get(get_room_by_id))
         .route("/rooms/:id", routing::put(update_room))
         .route("/rooms/:id", routing::delete(delete_room))
-        .layer(Extension(db))
         .layer(
             CorsLayer::new()
                 .allow_origin([
@@ -49,7 +48,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 ])
                 .allow_methods([Method::GET, Method::POST, Method::PUT, Method::DELETE])
                 .allow_headers([http::header::CONTENT_TYPE]),
-        );
+        )
+        .with_state(db);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::info!("Service started. Listening on {}", addr);

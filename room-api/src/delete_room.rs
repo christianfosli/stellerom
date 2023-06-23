@@ -1,4 +1,7 @@
-use axum::{extract::Path, http::StatusCode, Extension};
+use axum::{
+    extract::{Path, State},
+    http::StatusCode,
+};
 use mongodb::{
     bson::{doc, Uuid},
     Database,
@@ -8,7 +11,7 @@ use crate::models::ChangingRoom;
 
 pub async fn delete_room(
     Path(id): Path<String>,
-    Extension(db): Extension<Database>,
+    State(db): State<Database>,
 ) -> Result<(), (StatusCode, String)> {
     let id = Uuid::parse_str(&id).map_err(|e| {
         tracing::error!(err = e.to_string(), "Unable to parse uuid from string");
