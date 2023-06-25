@@ -6,10 +6,10 @@ A hobby project to try out some new technology :smile:
 
 ## URL's
 
-| Environment | URL                                                  |
-|-------------|------------------------------------------------------|
-| Production  | [https://www.stellerom.no](https://www.stellerom.no) |
-| Development | [https://dev.stellerom.no](https://dev.stellerom.no) |
+| Environment | Web app                                              | Room API                                                                 | Review API                                                                   |
+|-------------|------------------------------------------------------|--------------------------------------------------------------------------|------------------------------------------------------------------------------|
+| Production  | [https://www.stellerom.no](https://www.stellerom.no) | [https://room-api-prod.stellerom.no](https://room-api-prod.stellerom.no) | [https://review-api-prod.stellerom.no](https://review-api-prod.stellerom.no) |
+| Development | [https://dev.stellerom.no](https://dev.stellerom.no) | [https://room-api-dev.stellerom.no](https://room-api-dev.stellerom.no)   | [https://review-api-dev.stellerom.no](https://review-api-dev.stellerom.no)   |
 
 ## Development
 
