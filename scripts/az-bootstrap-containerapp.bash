@@ -22,8 +22,7 @@ if az containerapp env show -n "cappenv-stellerom-$ENVIRONMENT" -g "rg-stellerom
   printf 'Containerapp env already exists\n'
 else
   printf 'Creating containerapp env\n'
-  # Currently (July, 2022) azure container app is not available in Norwegian data centers, therefore WestEurope
-  az containerapp env create -n "cappenv-stellerom-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT" -l westeurope
+  az containerapp env create -n "cappenv-stellerom-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT" -l norwayeast
 fi
 
 if az containerapp show -n "capp-stellerom-$SERVICE_NAME-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT"; then
