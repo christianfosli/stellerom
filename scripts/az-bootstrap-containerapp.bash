@@ -33,6 +33,18 @@ else
     --image "ghcr.io/christianfosli/stellerom/$SERVICE_NAME:${GITHUB_SHA:-latest}" \
     --target-port "$TARGET_PORT" \
     --ingress 'external'
+fi
 
-    printf '\n**TODO/Manual step**: Add custom domain and configure dns records. Follow az portal instructions.\n'
+# Manual Step: Configure CNAME record and validation with domain registrar
+if az containerapp hostname list -n capp-stellerom-$SERVICE_NAME-$ENVIRONMENT -g "rg-stellerom-$ENVIRONMENT" \
+  | grep "$SERVICE_NAME-$ENVIRONMENT.stellerom.no"; then
+  printf 'Custom domain name already set up\n'
+else
+  printf 'Setting up custom hostname and TLS\nEnsure DNS is configured already\n'
+  az containerapp hostname add -n "capp-stellerom-$SERVICE_NAME-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT" \
+    --hostname "$SERVICE_NAME-$ENVIRONMENT.stellerom.no"
+
+  az containerapp hostname bind -n "capp-stellerom-$SERVICE_NAME-$ENVIRONMENT" -g "rg-stellerom-$ENVIRONMENT" \
+    --environment "cappenv-stellerom-$ENVIRONMENT" \
+    --hostname "$SERVICE_NAME-$ENVIRONMENT.stellerom.no" --validation-method CNAME
 fi
