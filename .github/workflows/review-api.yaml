@@ -77,9 +77,8 @@ jobs:
             --image ghcr.io/christianfosli/stellerom/review-api:${{ github.sha }} \
             --min-replicas 0 --max-replicas 2 \
             --set-env-vars "REVIEW_API_DB_CONNSTR=secretref:db-connstr" "REVIEW_API_DB_NAME=review-api-dev" \
-            "ROOM_API_URL=https://capp-stellerom-room-api-dev.wonderfulsand-142627d1.westeurope.azurecontainerapps.io" \
+            "ROOM_API_URL=https://room-api-dev.stellebord.no" \
             "ALLOWED_IMAGE_BASE_URLS='["https://ststelleromdev.blob.core.windows.net"]'"
-            # TODO: Switch above URL to https://room-api-dev.stellebord.no when azure container apps get support for custom domains with managed TLS certs
         env:
           DB_CONNSTR: "mongodb+srv://${{ secrets.REVIEW_API_DB_USERNAME }}:${{ secrets.REVIEW_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
 
@@ -114,8 +113,7 @@ jobs:
             --image ghcr.io/christianfosli/stellerom/review-api:${{ github.sha }} \
             --min-replicas 1 --max-replicas 5 \
             --set-env-vars "REVIEW_API_DB_CONNSTR=secretref:db-connstr" "REVIEW_API_DB_NAME=review-api-prod" \
-            "ROOM_API_URL=https://capp-stellerom-room-api-prod.proudfield-3e3747dd.westeurope.azurecontainerapps.io" \
+            "ROOM_API_URL=https://room-api-prod.stellerom.no" \
             "ALLOWED_IMAGE_BASE_URLS='["https://ststelleromprod.blob.core.windows.net"]'"
-            # TODO: Switch above URL to https://room-api-prod.stellebord.no when azure container apps get support for custom domains with managed TLS certs
         env:
           DB_CONNSTR: "mongodb+srv://${{ secrets.REVIEW_API_DB_USERNAME }}:${{ secrets.REVIEW_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
