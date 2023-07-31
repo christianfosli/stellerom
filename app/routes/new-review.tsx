@@ -1,7 +1,3 @@
-/** @jsx h */
-/** @jsxFrag Fragment */
-import { Fragment, h } from "preact";
-import { tw } from "@twind";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Header from "../utils/Header.tsx";
 import RangeInput from "../islands/RangeInput.tsx";
@@ -20,7 +16,7 @@ interface NewReviewData {
 }
 
 const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
-  "https://room-api-dev.stellerom.no";
+  "https://review-api-dev.stellerom.no";
 
 export const handler: Handlers<NewReviewData> = {
   GET(req, ctx) {
@@ -113,24 +109,24 @@ function renderForm(data: NewReviewData) {
   return (
     <form
       method="POST"
-      class={tw`rounded shadow-md p-5`}
+      class="rounded shadow-md p-5"
     >
-      <fieldset class={tw`my-5`}>
-        <legend class={tw`block text-md font-bold`}>Stellerom</legend>
-        <div class={tw`w-full flex flex-row justify-between`}>
+      <fieldset class="my-5">
+        <legend class="block text-md font-bold">Stellerom</legend>
+        <div class="w-full flex flex-row justify-between">
           <input
-            class={tw`shadow border rounded w-5/4`}
+            class="shadow border rounded w-5/4"
             type="text"
             name="roomId"
             id="roomId"
             value={data.formData?.roomId}
             required
           />
-          <label class={tw`text-sm`} for="roomId">
+          <label class="text-sm" for="roomId">
             {data.formData?.roomName}
           </label>
           <input
-            class={tw`shadow border rounded`}
+            class="shadow border rounded"
             type="hidden"
             name="roomName"
             id="roomName"
@@ -163,20 +159,20 @@ function renderForm(data: NewReviewData) {
         required={true}
       />
 
-      <label class={tw`block text-md font-bold mt-3`} for="reviewText">
+      <label class="block text-md font-bold mt-3" for="reviewText">
         Kommentarer (frivillig)
       </label>
       <textarea
-        class={tw`shadow border rounded w-full mb-3`}
+        class="shadow border rounded w-full mb-3"
         name="review"
         id="reviewText"
         rows={3}
       />
-      <label class={tw`block text-md font-bold`} for="reviewedBy">
+      <label class="block text-md font-bold" for="reviewedBy">
         Ditt navn (frivillig)
       </label>
       <input
-        class={tw`shadow border rounded w-full mb-3`}
+        class="shadow border rounded w-full mb-3"
         type="text"
         name="reviewedBy"
         id="reviewedBy"
@@ -184,7 +180,7 @@ function renderForm(data: NewReviewData) {
       />
 
       <button
-        class={tw`shadow bg-gray-300 text-md font-bold rounded p-2 w-full`}
+        class="shadow bg-gray-300 text-md font-bold rounded p-2 w-full"
         type="submit"
       >
         Opprett
@@ -195,15 +191,15 @@ function renderForm(data: NewReviewData) {
 
 export default function NewRoom({ data }: PageProps<NewReviewData>) {
   return (
-    <div class={tw`p-4 mx-auto max-w-screen-md`}>
+    <div class="p-4 mx-auto max-w-screen-md">
       <Header />
       <main>
-        <h2 class={tw`text-lg font-bold`}>
+        <h2 class="text-lg font-bold">
           Anmeld stellerom &quot;{data.formData.roomName}&quot;
         </h2>
         {data.submitError && (
-              <div class={tw`bg-red-300 rounded p-2`}>
-                <h3 class={tw`text-md font-bold`}>
+              <div class="bg-red-300 rounded p-2">
+                <h3 class="text-md font-bold">
                   Vi beklager, en feil har oppstått.
                 </h3>
                 <p>

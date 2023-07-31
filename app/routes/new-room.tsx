@@ -1,7 +1,3 @@
-/** @jsx h */
-/** @jsxFrag Fragment */
-import { Fragment, h } from "preact";
-import { tw } from "@twind";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Header from "../utils/Header.tsx";
 
@@ -71,23 +67,23 @@ function renderForm(data: NewRoomData) {
   return (
     <form
       method="POST"
-      class={tw`rounded shadow-md p-5 w-full`}
+      class="rounded shadow-md p-5 w-full"
     >
-      <label class={tw`block text-md font-bold`} for="name">Navn</label>
+      <label class="block text-md font-bold" for="name">Navn</label>
       <input
-        class={tw`shadow border rounded w-full`}
+        class="shadow border rounded w-full"
         type="text"
         name="name"
         id="name"
         required
       />
-      <fieldset class={tw`my-5`}>
-        <legend class={tw`block text-md font-bold`}>Posisjon</legend>
-        <div class={tw`flex items-center justify-between`}>
+      <fieldset class="my-5">
+        <legend class="block text-md font-bold">Posisjon</legend>
+        <div class="flex items-center justify-between">
           <span>
-            <label class={tw`text-sm`} for="lat">Latitude</label>
+            <label class="text-sm" for="lat">Latitude</label>
             <input
-              class={tw`shadow border rounded w-1/2`}
+              class="shadow border rounded w-1/2"
               type="number"
               name="lat"
               id="lat"
@@ -96,11 +92,11 @@ function renderForm(data: NewRoomData) {
             />
           </span>
           <span>
-            <label class={tw`text-sm`} for="lng">
+            <label class="text-sm" for="lng">
               Longitude
             </label>
             <input
-              class={tw`shadow border rounded w-1/2`}
+              class="shadow border rounded w-1/2"
               type="number"
               name="lng"
               id="lng"
@@ -111,7 +107,7 @@ function renderForm(data: NewRoomData) {
         </div>
       </fieldset>
       <button
-        class={tw`shadow bg-gray-300 text-md font-bold rounded p-2 w-full`}
+        class="shadow bg-gray-300 text-md font-bold rounded p-2 w-full"
         type="submit"
       >
         Opprett
@@ -132,7 +128,7 @@ export default function NewRoom({ data }: PageProps<NewRoomData>) {
             {data.submit == "SUCCESS" && (
                   <p>
                     Stellerommet ble lagt til! Gå{" "}
-                    <a class={tw`text-blue-700`} href="/">tilbake hjem</a>{" "}
+                    <a class="text-blue-700" href="/">tilbake hjem</a>{" "}
                     å se den på kartet.
                   </p>
                 ) ||
@@ -154,10 +150,10 @@ export default function NewRoom({ data }: PageProps<NewRoomData>) {
   };
 
   return (
-    <div class={tw`p-4 mx-auto max-w-screen-md`}>
+    <div class="p-4 mx-auto max-w-screen-md">
       <Header />
       <main>
-        <h2 class={tw`text-lg font-bold`}>Legg til nytt stellerom</h2>
+        <h2 class="text-lg font-bold">Legg til nytt stellerom</h2>
         {renderMainContent()}
       </main>
     </div>

@@ -1,6 +1,3 @@
-/** @jsx h */
-import { h } from "preact";
-import { tw } from "@twind";
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Map from "../islands/Map.tsx";
 import Header from "../utils/Header.tsx";
@@ -25,12 +22,12 @@ export const handler: Handlers<ChangingRoom[]> = {
 
 export default function Home({ data }: PageProps<ChangingRoom[]>) {
   return (
-    <div class={tw`p-4 mx-auto max-w-screen-md`}>
+    <div class="p-4 mx-auto max-w-screen-md">
       <Header />
       <main>
         <Map apiKey={googleMapsApiKey} changingRooms={data} />
       </main>
-      <a class={tw`text-blue-700`} href="/about">Mer info</a>.
+      <a class="text-blue-700" href="/about">Mer info</a>.
     </div>
   );
 }

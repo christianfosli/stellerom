@@ -1,6 +1,3 @@
-/** @jsx h */
-import { h } from "preact";
-import { tw } from "@twind";
 import { ChangingRoom } from "../utils/models.ts";
 
 interface EditRoomProps {
@@ -60,14 +57,14 @@ export default function EditRoom(props: EditRoomProps) {
   return (
     <div>
       <button
-        class={tw`bg-gray-300 p-2 rounded-md border border-gray-700`}
+        class="bg-gray-300 p-2 rounded-md border border-gray-700"
         onClick={handleChangeName}
       >
         Endre navn
       </button>
       &nbsp;&nbsp;
       <button
-        class={tw`bg-red-300 p-2 rounded-md border border-red-700`}
+        class="bg-red-300 p-2 rounded-md border border-red-700"
         onClick={handleDelete}
       >
         Slett stellerom

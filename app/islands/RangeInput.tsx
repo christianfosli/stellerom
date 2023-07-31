@@ -1,8 +1,4 @@
-/** @jsx h */
-/** @jsxFrag Fragment */
-import { Fragment, h } from "preact";
 import { useState } from "preact/hooks";
-import { tw } from "@twind";
 
 export interface RangeInputProps {
   label: string;
@@ -26,12 +22,12 @@ export default function RangeInput(
 
   return (
     <>
-      <label class={tw`block text-md font-bold`} for={`RangeInput-${name}-inp`}>
+      <label class="block text-md font-bold" for={`RangeInput-${name}-inp`}>
         {label}
       </label>
-      <div class={tw`flex flex-row justify-between`}>
+      <div class="flex flex-row justify-between">
         <input
-          class={tw`w-5/6`}
+          class="w-5/6"
           type="range"
           value={value}
           min={min}
@@ -41,7 +37,7 @@ export default function RangeInput(
           required={required}
           onInput={handleChange}
         />
-        <span class={tw`text-md`}>{value}/{max}</span>
+        <span class="text-md">{value}/{max}</span>
       </div>
     </>
   );

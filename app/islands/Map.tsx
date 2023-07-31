@@ -1,7 +1,5 @@
-/** @jsx h */
-import { h } from "preact";
 import { useEffect, useRef, useState } from "preact/hooks";
-import { tw } from "@twind";
+import { tw } from "twind";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ChangingRoom } from "../utils/models.ts";
 
@@ -203,10 +201,10 @@ export default function MyMap(props: MapProps) {
       >
         {infoMsg}
       </p>
-      <div ref={mapDiv} class={tw`w-full h-96`}>
+      <div ref={mapDiv} class="w-full h-96">
       </div>
       <button
-        class={tw`inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
+        class="inline-block bg-gray-300 p-2 rounded-md border border-gray-700"
         type="button"
         onClick={showCurrentLocation}
       >
@@ -214,7 +212,7 @@ export default function MyMap(props: MapProps) {
       </button>
       {addingChangingRoom.active && (
             <button
-              class={tw`inline-block bg-yellow-400 p-2 rounded-md border border-gray-700`}
+              class="inline-block bg-yellow-400 p-2 rounded-md border border-gray-700"
               type="button"
               onClick={stopAddingChangingRoom}
             >
@@ -222,7 +220,7 @@ export default function MyMap(props: MapProps) {
             </button>
           ) || (
         <button
-          class={tw`inline-block bg-gray-300 p-2 rounded-md border border-gray-700`}
+          class="inline-block bg-gray-300 p-2 rounded-md border border-gray-700"
           type="button"
           onClick={startAddingChangingRoom}
         >
