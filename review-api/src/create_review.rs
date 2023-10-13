@@ -5,6 +5,7 @@ use mongodb::{
     bson::{doc, Uuid},
     Collection, Database,
 };
+use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
@@ -12,11 +13,9 @@ use std::env;
 
 use crate::models::{Review, StarRating};
 
-lazy_static! {
-    static ref ALLOWED_IMAGE_BASE_URLS: Vec<String> =
-        serde_json::from_str(&env::var("ALLOWED_IMAGE_BASE_URLS").unwrap_or("[]".to_owned()))
-            .unwrap();
-}
+static ALLOWED_IMAGE_BASE_URLS: Lazy<Vec<String>> = Lazy::new(|| {
+    serde_json::from_str(&env::var("ALLOWED_IMAGE_BASE_URLS").unwrap_or("[]".to_owned())).unwrap()
+});
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct CreateReview {

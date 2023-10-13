@@ -8,9 +8,6 @@ use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
 use tower_http::cors::CorsLayer;
 
-#[macro_use]
-extern crate lazy_static;
-
 use crate::create_review::create_review;
 use crate::get_reviews::get_reviews;
 use crate::healthcheck::{live, ready};

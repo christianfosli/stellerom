@@ -21,9 +21,6 @@ mod healthcheck;
 mod models;
 mod update_room;
 
-#[macro_use]
-extern crate lazy_static;
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     tracing_subscriber::fmt::init();

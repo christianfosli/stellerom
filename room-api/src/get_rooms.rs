@@ -8,15 +8,16 @@ use mongodb::{
     bson::{doc, Uuid},
     Database,
 };
+use once_cell::sync::Lazy;
 
 use crate::models::ChangingRoom;
 
-lazy_static! {
-    static ref GENERIC_DB_ERROR: (StatusCode, String) = (
+static GENERIC_DB_ERROR: Lazy<(StatusCode, String)> = Lazy::new(|| {
+    (
         StatusCode::INTERNAL_SERVER_ERROR,
         String::from("An unexpected error occured getting data from database"),
-    );
-}
+    )
+});
 
 pub async fn get_all_rooms(
     State(db): State<Database>,
