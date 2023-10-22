@@ -1,10 +1,8 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { Head } from "$fresh/src/runtime/head.ts";
 import Map from "../islands/Map.tsx";
 import Header from "../utils/Header.tsx";
-
-const googleMapsApiKey = Deno.env.get("GOOGLE_MAPS_API_KEY") ?? (() => {
-  throw new Error("GOOGLE_MAPS_API_KEY was not set but is required");
-})();
+import { ChangingRoom } from "../utils/models.ts";
 
 const roomApiUrl = Deno.env.get("ROOM_API_URL") ??
   "https://room-api-dev.stellerom.no";
@@ -22,12 +20,22 @@ export const handler: Handlers<ChangingRoom[]> = {
 
 export default function Home({ data }: PageProps<ChangingRoom[]>) {
   return (
-    <div class="p-4 mx-auto max-w-screen-md">
-      <Header />
-      <main>
-        <Map apiKey={googleMapsApiKey} changingRooms={data} />
-      </main>
-      <a class="text-blue-700" href="/about">Mer info</a>.
-    </div>
+    <>
+      <Head>
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
+      </Head>
+      <div class="p-4 mx-auto max-w-screen-md">
+        <Header />
+        <main>
+          <Map changingRooms={data} />
+        </main>
+        <a class="text-blue-700" href="/about">Mer info</a>.
+      </div>
+    </>
   );
 }
