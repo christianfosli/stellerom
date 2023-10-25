@@ -20,6 +20,7 @@ const centerOfNorway = { lat: 64.68, lng: 9.39 };
 const defaultZoom = 4;
 
 export default function MyMap(props: MapProps) {
+  const addRoomHelperDialog = useRef<HTMLDialogElement | null>(null);
   const mapDiv = useRef<HTMLDivElement | null>(null);
   const [view, setView] = useState<View>();
   const [map, setMap] = useState<Map>();
@@ -111,12 +112,35 @@ export default function MyMap(props: MapProps) {
 
   return (
     <>
+      <dialog
+        ref={addRoomHelperDialog}
+        class="p-4 backdrop:bg-opacity-50 backdrop-blur z-20"
+      >
+        <button
+          class="absolute top-4 right-4"
+          onClick={() => addRoomHelperDialog.current!.close()}
+        >
+          X
+        </button>
+        <h2 class="text-lg font-bold">Legg til nytt stellerom</h2>
+        <p>
+          Vi benytter data fra OpenStreetMap for å vise kart og stellerom.
+          Manglende stellerom legges inn via OpenStreetMap.
+        </p>
+      </dialog>
       <div id="map" class="w-full h-80 my-1" ref={mapDiv}></div>
       <button
         class="bg-gray-300 p-2 rounded-md border border-gray-700"
         onClick={trackPosition}
       >
         Vis min posisjon
+      </button>
+      <button
+        class="bg-gray-300 p-2 rounded-md border border-gray-700"
+        onClick={() => addRoomHelperDialog.current?.show()}
+        disabled={addRoomHelperDialog.current?.open}
+      >
+        Legg til nytt stellerom
       </button>
     </>
   );
