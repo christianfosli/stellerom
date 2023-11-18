@@ -7,7 +7,7 @@ import OSM from "ol/source/OSM.js";
 import Feature from "ol/Feature.js";
 import Point from "ol/geom/Point.js";
 import Geolocation from "ol/Geolocation.js";
-import { Circle, Fill, Stroke, Style } from "ol/style.js";
+import { Circle, Fill, Stroke, Style, Text } from "ol/style.js";
 import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import { useGeographic } from "ol/proj.js";
@@ -52,6 +52,49 @@ export default function MyMap(props: MapProps) {
 
     return () => map.setTarget("");
   }, []);
+
+  useEffect(() => {
+    if (!view || !map) {
+      console.info(
+        "Can't draw changing rooms yet because map is not initialized",
+      );
+      return;
+    }
+
+    console.log(props.changingRooms.length);
+
+    const features = props.changingRooms.map((cr) => {
+      const feature = new Feature({
+        style: new Style({
+          image: new Circle({
+            radius: 6,
+            fill: new Fill({
+              color: "#bada55",
+            }),
+            stroke: new Stroke({
+              color: "#fff",
+              width: 2,
+            }),
+            text: new Text({
+              font: "12px Calibri,sans-serif",
+              fill: new Fill({ color: "#000" }),
+              text: map.getView().getZoom() > 12 ? cr.name : "",
+            }),
+          }),
+        }),
+      });
+
+      feature.setGeometry(new Point([cr.location.lng, cr.location.lat]));
+
+      return feature;
+    });
+
+    const source = new VectorSource({
+      features,
+    });
+
+    const _layer = new VectorLayer({ source, map });
+  }, [map]);
 
   const trackPosition = () => {
     if (!view || !map) {
@@ -114,7 +157,7 @@ export default function MyMap(props: MapProps) {
     <>
       <dialog
         ref={addRoomHelperDialog}
-        class="p-4 backdrop:bg-opacity-50 backdrop-blur z-20"
+        class="p-4 bg-gray-200/70 backdrop-blur z-20"
       >
         <button
           class="absolute top-4 right-4"
