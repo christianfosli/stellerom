@@ -77,7 +77,7 @@ jobs:
             --image ghcr.io/christianfosli/stellerom/review-api:${{ github.sha }} \
             --min-replicas 0 --max-replicas 2 \
             --set-env-vars "REVIEW_API_DB_CONNSTR=secretref:db-connstr" "REVIEW_API_DB_NAME=review-api-dev" \
-            "ROOM_API_URL=https://room-api-dev.stellebord.no" \
+            "ROOM_API_URL=https://room-api-dev.stellerom.no" \
             "ALLOWED_IMAGE_BASE_URLS='["https://ststelleromdev.blob.core.windows.net"]'"
         env:
           DB_CONNSTR: "mongodb+srv://${{ secrets.REVIEW_API_DB_USERNAME }}:${{ secrets.REVIEW_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
