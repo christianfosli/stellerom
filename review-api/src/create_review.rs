@@ -5,15 +5,14 @@ use mongodb::{
     bson::{doc, Uuid},
     Collection, Database,
 };
-use once_cell::sync::Lazy;
 use reqwest::Client;
 use serde::Deserialize;
 use serde_json::json;
-use std::env;
+use std::{env, sync::LazyLock};
 
 use crate::models::{Review, StarRating};
 
-static ALLOWED_IMAGE_BASE_URLS: Lazy<Vec<String>> = Lazy::new(|| {
+static ALLOWED_IMAGE_BASE_URLS: LazyLock<Vec<String>> = LazyLock::new(|| {
     serde_json::from_str(&env::var("ALLOWED_IMAGE_BASE_URLS").unwrap_or("[]".to_owned())).unwrap()
 });
 
@@ -53,7 +52,7 @@ pub async fn create_review(
         reviewed_at: Utc::now(),
     };
 
-    collection.insert_one(&review, None).await.map_err(|e| {
+    collection.insert_one(&review).await.map_err(|e| {
         tracing::error!(err = e.to_string(), "Error persisting review to db");
         (
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -104,7 +103,7 @@ async fn update_room_ratings(
     room_id: &Uuid,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let reviews = collection
-        .find(doc! { "roomId": *room_id }, None)
+        .find(doc! { "roomId": *room_id })
         .await?
         .try_collect::<Vec<_>>()
         .await?;

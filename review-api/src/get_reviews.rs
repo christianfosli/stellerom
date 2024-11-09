@@ -24,24 +24,25 @@ pub async fn get_reviews(
 ) -> Result<Json<Vec<Review>>, (StatusCode, String)> {
     let collection = db.collection::<Review>("reviews");
 
-    let filter = param
-        .room_id
-        .map(Uuid::parse_str)
-        .transpose()
-        .map_err(|e| {
-            tracing::error!(err = e.to_string(), "Unable to parse room-id as uuid");
-            (
-                StatusCode::UNPROCESSABLE_ENTITY,
-                format!(
-                    "Room-id must be a valid uuid but is not. Inner error: {}",
-                    e
-                ),
-            )
-        })?
-        .map(|room_id| doc! { "roomId": room_id });
+    let filter = match param.room_id {
+        Some(room_id) => {
+            let room_id = Uuid::parse_str(room_id).map_err(|e| {
+                tracing::error!(err = e.to_string(), "Unable to parse room-id as uuid");
+                (
+                    StatusCode::UNPROCESSABLE_ENTITY,
+                    format!(
+                        "Room-id must be a valid uuid but is not. Inner error: {}",
+                        e
+                    ),
+                )
+            })?;
+            doc! { "roomId": room_id}
+        }
+        None => doc! {},
+    };
 
     let reviews = collection
-        .find(filter, None)
+        .find(filter)
         .await
         .map_err(|e| {
             tracing::error!(err = e.to_string(), "Unable to get cursor for reviews");
