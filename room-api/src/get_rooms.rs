@@ -1,3 +1,5 @@
+use std::sync::LazyLock;
+
 use axum::{
     extract::{Path, State},
     http::StatusCode,
@@ -8,11 +10,10 @@ use mongodb::{
     bson::{doc, Uuid},
     Database,
 };
-use once_cell::sync::Lazy;
 
 use crate::models::ChangingRoom;
 
-static GENERIC_DB_ERROR: Lazy<(StatusCode, String)> = Lazy::new(|| {
+static GENERIC_DB_ERROR: LazyLock<(StatusCode, String)> = LazyLock::new(|| {
     (
         StatusCode::INTERNAL_SERVER_ERROR,
         String::from("An unexpected error occured getting data from database"),
@@ -25,7 +26,7 @@ pub async fn get_all_rooms(
     let collection = db.collection::<ChangingRoom>("rooms");
 
     let rooms = collection
-        .find(None, None)
+        .find(doc! {})
         .await
         .map_err(|e| {
             tracing::error!(err = e.to_string(), "Unable to get cursor for all rooms");
@@ -54,13 +55,10 @@ pub async fn get_room_by_id(
     })?;
 
     let collection = db.collection::<ChangingRoom>("rooms");
-    let result = collection
-        .find_one(doc! { "id": id }, None)
-        .await
-        .map_err(|e| {
-            tracing::error!(err = e.to_string(), "Unable to get room by id from db");
-            GENERIC_DB_ERROR.clone()
-        })?;
+    let result = collection.find_one(doc! { "id": id }).await.map_err(|e| {
+        tracing::error!(err = e.to_string(), "Unable to get room by id from db");
+        GENERIC_DB_ERROR.clone()
+    })?;
 
     match result {
         Some(room) => Ok(Json(room)),

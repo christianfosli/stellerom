@@ -24,7 +24,7 @@ pub async fn delete_room(
     let collection = db.collection::<ChangingRoom>("rooms");
 
     collection
-        .delete_one(doc! { "id": id }, None)
+        .delete_one(doc! { "id": id })
         .await
         .map_err(|e| {
             tracing::error!(err = e.to_string(), "Error deleting changing room");

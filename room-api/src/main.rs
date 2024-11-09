@@ -2,10 +2,10 @@ use std::env;
 use std::net::SocketAddr;
 
 use axum::http::{self, Method};
-use axum::Server;
 use axum::{routing, Router};
 use mongodb::options::ClientOptions;
 use mongodb::{Client, Database};
+use tokio::net::TcpListener;
 use tower_http::cors::CorsLayer;
 
 use crate::create_room::create_room;
@@ -49,9 +49,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .with_state(db);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    tracing::info!("Service started. Listening on {}", addr);
+    let listener = TcpListener::bind(addr).await?;
+    tracing::info!("Service started. Listening on {addr}");
 
-    Server::bind(&addr).serve(app.into_make_service()).await?;
+    axum::serve(listener, app).await?;
 
     Ok(())
 }

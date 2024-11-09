@@ -5,7 +5,6 @@ use axum::{
 };
 use mongodb::{
     bson::{doc, Uuid},
-    options::{FindOneAndReplaceOptions, ReturnDocument},
     Database,
 };
 use serde::Deserialize;
@@ -43,9 +42,6 @@ pub async fn update_room(
                 location: payload.location,
                 ratings: payload.ratings,
             },
-            FindOneAndReplaceOptions::builder()
-                .return_document(Some(ReturnDocument::After))
-                .build(),
         )
         .await
         .map_err(|e| {

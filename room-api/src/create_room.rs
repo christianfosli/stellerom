@@ -23,7 +23,7 @@ pub async fn create_room(
         ratings: None,
     };
 
-    collection.insert_one(&created, None).await.map_err(|e| {
+    collection.insert_one(&created).await.map_err(|e| {
         tracing::error!(err = e.to_string(), "Error persisting room to db");
         (
             StatusCode::INTERNAL_SERVER_ERROR,
