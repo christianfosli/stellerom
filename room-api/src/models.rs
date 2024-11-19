@@ -1,4 +1,5 @@
 use bounded_integer::BoundedU8;
+use geojson::Geometry;
 use mongodb::bson::Uuid;
 use serde::{Deserialize, Serialize};
 
@@ -7,7 +8,11 @@ pub struct ChangingRoom {
     pub id: Uuid,
     pub name: String,
     pub location: Location,
+    #[serde(rename = "locationGeo")]
+    pub location_geo: Geometry,
     pub ratings: Option<Ratings>,
+    #[serde(rename = "externalId")]
+    pub external_id: Option<String>,
 }
 
 #[derive(Clone, Copy, Debug, Serialize, Deserialize)]

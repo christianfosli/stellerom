@@ -161,6 +161,10 @@ export default function MyMap(props: MapProps) {
            <p>
              Klikk på &quot;Fortsett&quot; om du er fornøyd med plasseringen.
            </p>
+           <p class="${tw`fond-semibold`}">
+             Appen henter nå også data om stellerom fra <a href="https://www.openstreetmap.org/">OpenStreetMap</a>.
+             Vurder å legge inn stellerom der først, med &quot;changing_table=yes&quot; så vil den dukke opp her automatisk ila ett døgn.
+           </p>
             <a href="/new-room?lat=${lat}&lng=${lng}">
            <button class="${tw`bg-gray-300 p-2 rounded-md border border-gray-700`}">
           Fortsett
