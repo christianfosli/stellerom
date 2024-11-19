@@ -3,6 +3,7 @@ use axum::{
     http::StatusCode,
     Json,
 };
+use geojson::{Geometry, Value};
 use mongodb::{
     bson::{doc, Uuid},
     Database,
@@ -14,6 +15,8 @@ use crate::models::{ChangingRoom, Location, Ratings};
 #[derive(Clone, Debug, Deserialize)]
 pub struct UpdateChangingRoom {
     pub name: String,
+    #[serde(rename = "externalId")]
+    pub external_id: Option<String>,
     pub location: Location,
     pub ratings: Option<Ratings>,
 }
@@ -38,8 +41,13 @@ pub async fn update_room(
             doc! { "id": id },
             ChangingRoom {
                 id,
+                external_id: payload.external_id,
                 name: payload.name,
                 location: payload.location,
+                location_geo: Geometry::new(Value::Point(vec![
+                    payload.location.lng,
+                    payload.location.lat,
+                ])),
                 ratings: payload.ratings,
             },
         )

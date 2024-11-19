@@ -1,4 +1,5 @@
 use axum::{extract::State, http::StatusCode, Json};
+use geojson::{Geometry, Value};
 use mongodb::{bson::Uuid, Database};
 use serde::Deserialize;
 
@@ -18,8 +19,13 @@ pub async fn create_room(
 
     let created = ChangingRoom {
         id: Uuid::new(),
+        external_id: None,
         name: payload.name,
         location: payload.location,
+        location_geo: Geometry::new(Value::Point(vec![
+            payload.location.lng,
+            payload.location.lat,
+        ])),
         ratings: None,
     };
 

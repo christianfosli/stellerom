@@ -1,0 +1,117 @@
+name: osm-sync-job-cicd
+
+on:
+  push:
+    paths:
+      - osm-sync/**
+      - .github/workflows/osm-sync.yaml
+      - scripts/az-bootstrap-containerapp-job.bash
+  workflow_dispatch:
+
+permissions:
+  # required for federated credentials to access azure
+  id-token: write
+  # required for federated credentials to access azure
+  contents: read
+  # required to push to ghcr
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ghcr
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build
+        run: |
+          tags="-t ghcr.io/christianfosli/stellerom/osm-sync:${{ github.sha }}"
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            printf 'Banch is main! Tagging with latest\n'
+            tags="$tags -t ghcr.io/christianfosli/stellerom/osm-sync:latest"
+          fi
+          docker buildx build \
+            --cache-from "type=gha,scope=osm-sync" \
+            --cache-to "type=gha,mode=max,scope=osm-sync" \
+            -f osm-sync/Dockerfile \
+            $tags \
+            .
+        env:
+          DOCKER_BUILDKIT: "1"
+
+      - name: Push
+        run: |
+          docker push --all-tags ghcr.io/christianfosli/stellerom/osm-sync
+
+  deploy_dev:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: Development
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZ_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZ_TENANT_ID }}
+          subscription-id: ${{ secrets.AZ_SUBS_ID }}
+
+      - name: Infra
+        run: ./scripts/az-bootstrap-containerapp-job.bash
+        env:
+          ENVIRONMENT: dev
+          SERVICE_NAME: osm-sync
+          CRON_EXPRESSION: '55 19 * * *'
+
+      - name: Deploy
+        run: |
+          set -eo pipefail
+
+          az containerapp job secret set -n caj-stellerom-osm-sync-dev -g rg-stellerom-dev \
+            --secrets "db-connstr=$DB_CONNSTR"
+
+          az containerapp job update -n caj-stellerom-osm-sync-dev -g rg-stellerom-dev \
+            --image ghcr.io/christianfosli/stellerom/osm-sync:${{ github.sha }} \
+            --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-dev"
+        env:
+          DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
+
+  deploy_prod:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: deploy_dev
+    runs-on: ubuntu-latest
+    environment: Production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZ_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZ_TENANT_ID }}
+          subscription-id: ${{ secrets.AZ_SUBS_ID }}
+
+      - name: Infra
+        run: ./scripts/az-bootstrap-containerapp-job.bash
+        env:
+          ENVIRONMENT: prod
+          SERVICE_NAME: osm-sync
+          CRON_EXPRESSION: '0 20 * * *'
+
+      - name: Deploy
+        run: |
+          az containerapp job secret set -n caj-stellerom-osm-sync-prod -g rg-stellerom-prod \
+            --secrets "db-connstr=$DB_CONNSTR"
+
+          az containerapp job update -n caj-stellerom-osm-sync-prod -g rg-stellerom-prod \
+            --image ghcr.io/christianfosli/stellerom/osm-sync:${{ github.sha }} \
+            --set-env-vars "ROOM_API_DB_CONNSTR=secretref:db-connstr" "ROOM_API_DB_NAME=room-api-prod"
+        env:
+          DB_CONNSTR: "mongodb+srv://${{ secrets.ROOM_API_DB_USERNAME }}:${{ secrets.ROOM_API_DB_PASSWORD}}@azure-stellerom.au87e49.mongodb.net"
