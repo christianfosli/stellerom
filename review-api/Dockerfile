@@ -1,8 +1,12 @@
 FROM rust:1.82 AS builder
 
 WORKDIR /usr/src/review-api
-COPY . .
-RUN cargo install --path .
+RUN --mount=type=bind,source=src,target=src \
+    --mount=type=bind,source=Cargo.toml,target=Cargo.toml \
+    --mount=type=bind,source=Cargo.lock,target=Cargo.lock \
+    --mount=type=cache,target=target/ \
+    --mount=type=cache,target=/usr/local/cargo/registry/ \
+    cargo install --path .
 
 FROM debian:12-slim AS final
 ARG RUST_LOG=info

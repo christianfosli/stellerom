@@ -18,7 +18,7 @@ permissions:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
@@ -37,7 +37,11 @@ jobs:
             tags="$tags -t ghcr.io/christianfosli/stellerom/review-api:latest"
           fi
           cd review-api
-          docker build $tags .
+          docker buildx build \
+            --cache-from "type=gha,scope=review-api" \
+            --cache-to "type=gha,mode=max,scope=review-api" \
+            $tags \
+            .
         env:
           DOCKER_BUILDKIT: "1"
 
@@ -47,7 +51,7 @@ jobs:
 
   deploy_dev:
     needs: build
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     environment: Development
     steps:
       - uses: actions/checkout@v4
@@ -85,7 +89,7 @@ jobs:
   deploy_prod:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs: deploy_dev
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     environment: Production
     steps:
       - uses: actions/checkout@v4
