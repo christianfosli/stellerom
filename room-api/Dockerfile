@@ -1,4 +1,4 @@
-FROM rust:1.82 AS builder
+FROM rust:1.83 AS builder
 
 WORKDIR /usr/src/room-api
 RUN --mount=type=bind,source=src,target=src \
