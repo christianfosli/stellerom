@@ -23,9 +23,9 @@ pub struct Location {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct Ratings {
-    availability: StarRating,
-    safety: StarRating,
-    cleanliness: StarRating,
+    pub availability: StarRating,
+    pub safety: StarRating,
+    pub cleanliness: StarRating,
 }
 
-type StarRating = BoundedU8<1, 5>;
+pub type StarRating = BoundedU8<1, 5>;

@@ -10,7 +10,7 @@ use tower_http::cors::CorsLayer;
 
 use crate::create_room::create_room;
 use crate::delete_room::delete_room;
-use crate::get_rooms::{get_all_rooms, get_room_by_id};
+use crate::get_rooms::{get_all_rooms, get_all_rooms_v2, get_room_by_id};
 use crate::healthcheck::{live, ready};
 use crate::update_room::update_room;
 
@@ -32,6 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/livez", routing::get(live))
         .route("/rooms", routing::post(create_room))
         .route("/rooms", routing::get(get_all_rooms))
+        .route("/rooms-v2", routing::get(get_all_rooms_v2))
         .route("/rooms/:id", routing::get(get_room_by_id))
         .route("/rooms/:id", routing::put(update_room))
         .route("/rooms/:id", routing::delete(delete_room))
