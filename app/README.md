@@ -1,22 +1,17 @@
-# Stellebord App
+# Stellerom app
 
-The frontend app.
-Made with [Deno's Fresh framework](https://fresh.deno.dev/) and deployed using Deno Deploy.
+The frontend app. Using Python and Streamlit.
 
-### Running locally
+## Running locally
 
-Install Deno if needed.
-
-Set required environment variable(s):
-
-```
-export GOOGLE_MAPS_API_KEY=YOUR_API_KEY_FROM_GOOGLE_CLOUD
+```sh
+uv run -- streamlit run app.py
 ```
 
-Start the project:
+Or
 
+```sh
+uv sync
+. .venv/bin/activate
+streamlit run app.py
 ```
-deno task start
-```
-
-This will watch the project directory and restart as necessary.
