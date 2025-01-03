@@ -32,7 +32,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             CorsLayer::new()
                 .allow_origin([
                     // adding frontend app for all environments for simplicity
-                    "http://localhost:8000".parse()?,
+                    "http://localhost:8501".parse()?,
                     "https://dev.stellerom.no".parse()?,
                     "https://www.stellerom.no".parse()?,
                 ])
