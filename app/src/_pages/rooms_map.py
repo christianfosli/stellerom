@@ -1,19 +1,16 @@
 from datetime import datetime, timezone
-from geojson import Feature, FeatureCollection
-import streamlit as st
-from streamlit_js_eval import get_geolocation
-import pydeck as pdk
 
+import folium
+import streamlit as st
+from geojson import Feature, FeatureCollection
+from streamlit_folium import st_folium
+from streamlit_js_eval import get_geolocation
 
 from src.config import get_app_config
 from src.services.room_api import get_room_api_client
 
-
-DEFAULT_VIEW_STATE = pdk.ViewState(
-    latitude=64.68,
-    longitude=9.39,
-    zoom=4,
-)
+DEFAULT_LOCATION = 64.68, 9.39  # Norway
+DEFAULT_ZOOM = 4
 
 
 def get_rooms() -> FeatureCollection:
@@ -49,53 +46,40 @@ def main() -> None:
     if st.session_state.get("use_current_location", False):
         current_location = get_geolocation(component_key=st.session_state["use_current_location_clicked_at"])
         if current_location is not None:
-            initial_view_state = pdk.ViewState(
-                latitude=current_location["coords"]["latitude"],
-                longitude=current_location["coords"]["longitude"],
-                zoom=15,
-            )
+            loc: tuple[float, float] = (current_location["coords"]["latitude"], current_location["coords"]["longitude"])
+            zoom = 15
         else:
-            initial_view_state = DEFAULT_VIEW_STATE
+            loc = DEFAULT_LOCATION
+            zoom = DEFAULT_ZOOM
     else:
-        initial_view_state = DEFAULT_VIEW_STATE
+        loc = DEFAULT_LOCATION
+        zoom = DEFAULT_ZOOM
 
-    layer_id = "rooms-geojson-layer"
-    deck = pdk.Deck(
-        map_style=None,  # type: ignore
-        initial_view_state=initial_view_state,
-        tooltip={"html": " <h3>{name}</h3>\n{ratings_html}"},  # type: ignore
-        layers=[
-            pdk.Layer(
-                "GeoJsonLayer",
-                data=rooms,
-                id=layer_id,
-                pickable=True,
-                get_fill_color=[255, 255, 255, 127],
-                get_line_color=[255, 255, 255, 255],
-                get_point_radius=15,
-                point_radius_min_pixels=10,
-            ),
-        ],
+    map = folium.Map(
+        location=loc,
+        zoom_start=zoom,
     )
-
-    pdk_state = st.pydeck_chart(deck, use_container_width=True, on_select="rerun")
-
+    folium.GeoJson(
+        rooms,
+        name="rooms",
+        tooltip=folium.GeoJsonTooltip(fields=["name"], aliases=["Navn"]),
+        popup=folium.GeoJsonPopup(fields=["name", "ratings_html"], aliases=["Rom", "Anmeldelser"]),
+    ).add_to(map)
+    st_data = st_folium(map, use_container_width=True)
     st.button("Gå til min plassering", icon=":material/near_me:", on_click=set_use_current_location)
 
-    if "selection" in pdk_state:
-        sel_rooms = pdk_state["selection"].get("objects", {}).get(layer_id, [])
-        if sel_rooms:
-            sel_room = sel_rooms[0]
+    # if "last_active_drawing" in st_data and st_data["last_active_drawing"]:
+    # sel_room_id = st_data["last_active_drawing"]["id"]
+    # sel_room_props = st_data["last_active_drawing"]["properties"]
 
-            sel_room_index = pdk_state["selection"].get("indices", {}).get(layer_id, [])[0]
-            sel_room_id = rooms[sel_room_index]["id"]
+    # with st.container(border=True):
+    #     st.subheader(sel_room_props["name"])
+    #     st.html(sel_room_props["ratings_html"])
+    #     st.markdown(f"[Gå til rom](/room_details?id={sel_room_id})")
+    # We need to use an ordinary link rather than st.page_link due to https://github.com/streamlit/streamlit/issues/8112
+    # st.page_link(app.pages_path / "room_details.py", label="Gå til rom", icon=":material/pageview:")
 
-            with st.container(border=True):
-                st.subheader(sel_room["name"])
-                st.html(sel_room["ratings_html"])
-                st.markdown(f"[Gå til rom](/room_details?id={sel_room_id})")
-                # We need to use an ordinary link rather than st.page_link due to https://github.com/streamlit/streamlit/issues/8112
-                # st.page_link(app.pages_path / "room_details.py", label="Gå til rom", icon=":material/pageview:")
+    st.write(st_data)
 
 
 main()
