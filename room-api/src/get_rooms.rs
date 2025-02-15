@@ -71,6 +71,7 @@ pub async fn get_all_rooms_v2(
 
             // Properties
             let mut props = JsonObject::new();
+            props.insert(String::from("roomId"), Value::String(r.id.to_string()));
             props.insert(String::from("name"), Value::String(r.name));
             props.insert(
                 String::from("ratings"),
