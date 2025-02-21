@@ -7,7 +7,7 @@ from streamlit_folium import st_folium
 from streamlit_js_eval import get_geolocation
 
 from src.config import get_app_config
-from src.services.room_api import get_room_api_client
+from src.services.room_api import CreateChangingRoom, Location, get_room_api_client
 
 DEFAULT_LOCATION = 64.68, 9.39  # Norway
 DEFAULT_ZOOM = 4
@@ -33,15 +33,36 @@ def add_room_ratings_html(features: list[Feature]) -> None:
             f["properties"]["ratings_html"] = "<p>Ingen anmeldelser enda.</p>"
 
 
+def add_room_page_url(features: list[Feature]) -> None:
+    for f in features:
+        f["properties"]["page_url"] = (
+            f'<a href="/room_details?id={f["id"]}" target="_blank"><button>Åpne rom</button></a>'
+        )
+
+
 def set_use_current_location() -> None:
     # streamlit_js_eval doesn't play nicely with st.button, so we we use a flag var instead of getting location directly
     st.session_state["use_current_location"] = True
     st.session_state["use_current_location_clicked_at"] = datetime.now(tz=timezone.utc).isoformat()
 
 
+def set_adding_changing_room(value: bool) -> None:
+    st.session_state["adding_changing_room"] = value
+
+
+def create_room(name: str, lat: float, lng: float) -> None:
+    config = get_app_config()
+    room_api = get_room_api_client(config)
+    payload = CreateChangingRoom(name=name, location=Location(lat=lat, lng=lng))
+    room_api.create_room(payload)
+
+    set_adding_changing_room(value=False)
+
+
 def main() -> None:
     rooms = get_rooms()
     add_room_ratings_html(rooms.features)
+    add_room_page_url(rooms.features)
 
     if st.session_state.get("use_current_location", False):
         current_location = get_geolocation(component_key=st.session_state["use_current_location_clicked_at"])
@@ -55,7 +76,7 @@ def main() -> None:
         loc = DEFAULT_LOCATION
         zoom = DEFAULT_ZOOM
 
-    map = folium.Map(
+    f_map = folium.Map(
         location=loc,
         zoom_start=zoom,
     )
@@ -63,23 +84,67 @@ def main() -> None:
         rooms,
         name="rooms",
         tooltip=folium.GeoJsonTooltip(fields=["name"], aliases=["Navn"]),
-        popup=folium.GeoJsonPopup(fields=["name", "ratings_html"], aliases=["Rom", "Anmeldelser"]),
-    ).add_to(map)
-    st_data = st_folium(map, use_container_width=True)
+        popup=folium.GeoJsonPopup(
+            fields=["name", "ratings_html", "page_url"], aliases=["Rom", "Anmeldelser", "Mer info"]
+        ),
+    ).add_to(f_map)
+
+    if st.session_state.get("adding_changing_room", False) and st.session_state.get("adding_changing_room_loc", False):
+        folium.Marker(
+            location=st.session_state["adding_changing_room_loc"],
+            popup=folium.Popup(html="Valgt plassering", show=True),
+            icon=folium.Icon(icon="plus"),
+            draggable=False,
+        ).add_to(f_map)
+
+    st_map = st_folium(fig=f_map, key="rooms_map", use_container_width=True)
+
     st.button("Gå til min plassering", icon=":material/near_me:", on_click=set_use_current_location)
 
-    # if "last_active_drawing" in st_data and st_data["last_active_drawing"]:
-    # sel_room_id = st_data["last_active_drawing"]["id"]
-    # sel_room_props = st_data["last_active_drawing"]["properties"]
+    if st.session_state.get("adding_changing_room", False):
+        if st_map.get("last_clicked"):
+            lat, lng = st_map["last_clicked"]["lat"], st_map["last_clicked"]["lng"]
+            if ("adding_changing_room_loc" not in st.session_state or st.session_state["adding_changing_room_loc"]) != [
+                lat,
+                lng,
+            ]:
+                st.session_state["adding_changing_room_loc"] = [lat, lng]
+                st.session_state["map_zoom"] = st_map["zoom"]
+                st.rerun()
+        else:
+            lat, lng = st.session_state.get("adding_changing_room_loc", [None, None])
 
-    # with st.container(border=True):
-    #     st.subheader(sel_room_props["name"])
-    #     st.html(sel_room_props["ratings_html"])
-    #     st.markdown(f"[Gå til rom](/room_details?id={sel_room_id})")
-    # We need to use an ordinary link rather than st.page_link due to https://github.com/streamlit/streamlit/issues/8112
-    # st.page_link(app.pages_path / "room_details.py", label="Gå til rom", icon=":material/pageview:")
+        with st.container(border=True):
+            st.warning(
+                """Det er enda bedre å legge til nye rom direkte i Open Street Map enn her.
+Se "Beginners Guide" på [deres nettsider](https://wiki.openstreetmap.org/wiki/Beginners%27_guide) for mer info.
 
-    st.write(st_data)
+Open Street Map noder i Norge med `changing_table=yes` spesifisert synkroniseres automatisk en gang i døgnet."""
+            )
+
+            st.info("Klikk på kartet for å plassere stellerommet")
+            add_room_name = st.text_input(label="Navn")
+            add_room_col1, add_room_col2 = st.columns(2)
+            add_room_col1.button(
+                "Avbryt",
+                icon=":material/cancel:",
+                on_click=set_adding_changing_room,
+                args=(False,),
+                use_container_width=True,
+            )
+            add_room_col2.button(
+                "Opprett",
+                on_click=create_room,
+                args=(add_room_name, lat, lng),
+                type="primary",
+                icon=":material/add:",
+                disabled="adding_changing_room_loc" not in st.session_state or not add_room_name,
+                use_container_width=True,
+            )
+
+    else:
+        if st.button("Legg til nytt stellerom", icon=":material/add:", on_click=set_adding_changing_room, args=(True,)):
+            st_map["last_clicked"] = None
 
 
 main()
