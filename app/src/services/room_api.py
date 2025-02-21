@@ -9,6 +9,7 @@ from requests.adapters import HTTPAdapter
 import streamlit as st
 import geojson
 from geojson import FeatureCollection
+from streamlit.runtime.caching.cache_utils import BoundCachedFunc, CachedFunc
 
 from src.config import AppConfig
 
@@ -31,6 +32,11 @@ class Ratings:
 class Location:
     lat: float
     lng: float
+
+
+class CreateChangingRoom(BaseModel):
+    name: str
+    location: Location
 
 
 class ChangingRoom(BaseModel):
@@ -78,6 +84,21 @@ class RoomApi(Session):
             res.raise_for_status()
             room = ChangingRoom.model_validate_json(res.text)
             return room
+        except HTTPError as e:
+            st.error(
+                f"**An error occured fetching changing room. Status code {e.response.status_code}**\n\nResponse text:\n{e.response.text}"
+            )
+            raise
+
+    def create_room(self, room: CreateChangingRoom) -> None:
+        try:
+            with st.spinner("Laster stellerom..."):
+                res = self.post(f"{self.base_url}/rooms", json=room.model_dump(mode="json"))
+            res.raise_for_status()
+
+            # Clear memory cache upon successful create
+            assert isinstance(self.get_all_rooms, BoundCachedFunc)
+            self.get_all_rooms.clear()
         except HTTPError as e:
             st.error(
                 f"**An error occured fetching changing room. Status code {e.response.status_code}**\n\nResponse text:\n{e.response.text}"
