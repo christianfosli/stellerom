@@ -33,9 +33,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .route("/rooms", routing::post(create_room))
         .route("/rooms", routing::get(get_all_rooms))
         .route("/rooms-v2", routing::get(get_all_rooms_v2))
-        .route("/rooms/:id", routing::get(get_room_by_id))
-        .route("/rooms/:id", routing::put(update_room))
-        .route("/rooms/:id", routing::delete(delete_room))
+        .route("/rooms/{id}", routing::get(get_room_by_id))
+        .route("/rooms/{id}", routing::put(update_room))
+        .route("/rooms/{id}", routing::delete(delete_room))
         .layer(
             CorsLayer::new()
                 .allow_origin([

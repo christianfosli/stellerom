@@ -1,4 +1,4 @@
-FROM rust:1.83 AS builder
+FROM rust:1.85 AS builder
 
 # Build context should be one folder up from normal, because we include a symlink under room-api
 WORKDIR /usr/src

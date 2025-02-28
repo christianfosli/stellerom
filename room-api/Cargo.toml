@@ -1,12 +1,12 @@
 [package]
 name = "room-api"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = "0.7"
+axum = "0.8"
 bounded-integer = { version = "0.5", features = ["std", "types", "serde1"] }
 futures = "0.3"
 geojson = "0.24"
