@@ -2,116 +2,116 @@ use std::env;
 
 use geojson::{Geometry, Value};
 use models::{ChangingRoom, Location};
-use mongodb::bson::{doc, Uuid};
 use mongodb::IndexModel;
-use mongodb::{options::ClientOptions, Client, Collection, Database};
+use mongodb::bson::{Bson, Uuid, doc};
+use mongodb::{Client, Collection, Database, options::ClientOptions};
 use osmgraph::api::{OverpassResponse, QueryEngine};
-use osmgraph::graph::{get_osm_nodes, OSMNode};
+use osmgraph::graph::{OSMNode, get_osm_nodes};
 
 mod models; // models module symlinked from room-api
 
-async fn update_changing_room(
-    collection: &Collection<ChangingRoom>,
-    existing_doc: &ChangingRoom,
-    node: &OSMNode,
-) -> Result<(), Box<dyn std::error::Error>> {
-    let name = node
-        .tags()
-        .clone()
-        .and_then(|tags| tags.get("name").cloned())
-        .unwrap_or_else(|| {
-            if existing_doc.name.starts_with("Node ")
-                && existing_doc.name.ends_with("from OpenStreetMap")
-            {
-                // Update name in case node id has changed
-                format!("Node {} from OpenStreetMap", node.id())
-            } else {
-                // Leave existing name in case it has been edited outside of osm
-                existing_doc.name.clone()
-            }
-        });
+// async fn update_changing_room(
+//     collection: &Collection<ChangingRoom>,
+//     existing_doc: &ChangingRoom,
+//     node: &OSMNode,
+// ) -> Result<(), Box<dyn std::error::Error>> {
+//     let name = node
+//         .tags()
+//         .clone()
+//         .and_then(|tags| tags.get("name").cloned())
+//         .unwrap_or_else(|| {
+//             if existing_doc.name.starts_with("Node ")
+//                 && existing_doc.name.ends_with("from OpenStreetMap")
+//             {
+//                 // Update name in case node id has changed
+//                 format!("Node {} from OpenStreetMap", node.id())
+//             } else {
+//                 // Leave existing name in case it has been edited outside of osm
+//                 existing_doc.name.clone()
+//             }
+//         });
 
-    let updated = ChangingRoom {
-        id: existing_doc.id,
-        external_id: Some(format!("osm:{}", node.id())),
-        name,
-        location: Location {
-            lat: node.lat(),
-            lng: node.lon(),
-        },
-        location_geo: Geometry::new(Value::Point(vec![node.lon(), node.lat()])),
-        ratings: existing_doc.ratings.clone(),
-    };
+//     let updated = ChangingRoom {
+//         id: existing_doc.id,
+//         external_id: Some(format!("osm:{}", node.id())),
+//         name,
+//         location: Location {
+//             lat: node.lat(),
+//             lng: node.lon(),
+//         },
+//         location_geo: Geometry::new(Value::Point(vec![node.lon(), node.lat()])),
+//         ratings: existing_doc.ratings.clone(),
+//     };
 
-    collection
-        .find_one_and_replace(doc! {"id": existing_doc.id}, updated)
-        .await?;
-    Ok(())
-}
+//     collection
+//         .find_one_and_replace(doc! {"id": existing_doc.id}, updated)
+//         .await?;
+//     Ok(())
+// }
 
-async fn upsert_changing_room(
-    collection: &Collection<ChangingRoom>,
-    node: &OSMNode,
-) -> Result<(), Box<dyn std::error::Error>> {
-    if let Some(room) = collection
-        .find_one(doc! {"externalId": &format!("osm:{}", node.id())})
-        .await?
-    {
-        tracing::info!(
-            "Updating existing room {} {:?}, identified by node id {}",
-            room.id,
-            room.external_id,
-            node.id(),
-        );
-        update_changing_room(collection, &room, node).await?;
-    } else if let Some(room) = collection
-        .find_one(doc! {
-        "location_geo": doc! {
-            "$near": {
-                "$geometry": {
-                    "type": "Point", "coordinates": [node.lon(), node.lat()]
-                },
-                "$maxDistance": 10,
-            }
-        }})
-        .await?
-    {
-        tracing::info!(
-            "Updating existing room {} {:?} identified by geo proximity {:?} {:?}",
-            room.id,
-            room.external_id,
-            room.location,
-            (node.lon(), node.lat()),
-        );
-        update_changing_room(collection, &room, node).await?;
-    } else {
-        tracing::info!(
-            "Adding new room for node {} {:?}",
-            node.id(),
-            (node.lon(), node.lat())
-        );
-        let name = node
-            .tags()
-            .clone()
-            .and_then(|tags| tags.get("name").cloned())
-            .unwrap_or(format!("Node {} from OpenStreetMap", node.id()));
+// async fn upsert_changing_room(
+//     collection: &Collection<ChangingRoom>,
+//     node: &OSMNode,
+// ) -> Result<(), Box<dyn std::error::Error>> {
+//     if let Some(room) = collection
+//         .find_one(doc! {"externalId": &format!("osm:{}", node.id())})
+//         .await?
+//     {
+//         tracing::info!(
+//             "Updating existing room {} {:?}, identified by node id {}",
+//             room.id,
+//             room.external_id,
+//             node.id(),
+//         );
+//         update_changing_room(collection, &room, node).await?;
+//     } else if let Some(room) = collection
+//         .find_one(doc! {
+//         "location_geo": doc! {
+//             "$near": {
+//                 "$geometry": {
+//                     "type": "Point", "coordinates": [node.lon(), node.lat()]
+//                 },
+//                 "$maxDistance": 10,
+//             }
+//         }})
+//         .await?
+//     {
+//         tracing::info!(
+//             "Updating existing room {} {:?} identified by geo proximity {:?} {:?}",
+//             room.id,
+//             room.external_id,
+//             room.location,
+//             (node.lon(), node.lat()),
+//         );
+//         update_changing_room(collection, &room, node).await?;
+//     } else {
+//         tracing::info!(
+//             "Adding new room for node {} {:?}",
+//             node.id(),
+//             (node.lon(), node.lat())
+//         );
+//         let name = node
+//             .tags()
+//             .clone()
+//             .and_then(|tags| tags.get("name").cloned())
+//             .unwrap_or(format!("Node {} from OpenStreetMap", node.id()));
 
-        let room = ChangingRoom {
-            id: Uuid::new(),
-            external_id: Some(format!("osm:{}", node.id())),
-            name,
-            location: Location {
-                lat: node.lat(),
-                lng: node.lon(),
-            },
-            location_geo: Geometry::new(Value::Point(vec![node.lon(), node.lat()])),
-            ratings: None,
-        };
+//         let room = ChangingRoom {
+//             id: Uuid::new(),
+//             external_id: Some(format!("osm:{}", node.id())),
+//             name,
+//             location: Location {
+//                 lat: node.lat(),
+//                 lng: node.lon(),
+//             },
+//             location_geo: Geometry::new(Value::Point(vec![node.lon(), node.lat()])),
+//             ratings: None,
+//         };
 
-        collection.insert_one(&room).await?;
-    }
-    Ok(())
-}
+//         collection.insert_one(&room).await?;
+//     }
+//     Ok(())
+// }
 
 async fn ensure_db_ix(
     collection: &Collection<ChangingRoom>,
@@ -160,26 +160,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let db = get_db_handle().await?;
     let collection = db.collection::<ChangingRoom>("rooms");
 
-    let engine = QueryEngine::new();
+    // ensure_db_ix(&collection).await?;
 
-    let query = r#"
-        [out:json];
-        area[name="Norge"]->.a;
-        node(area.a)[changing_table=yes];
-        out;
-    "#
-    .to_owned();
-
-    let res = engine.query(query).await?;
-    let res = serde_json::from_str::<OverpassResponse>(&res)?;
-    let nodes = get_osm_nodes(&res.elements())?;
-    tracing::info!("Found {} matching nodes", nodes.len());
-
-    ensure_db_ix(&collection).await?;
-
-    for n in nodes {
-        upsert_changing_room(&collection, &n).await?;
-    }
+    collection.update_many(
+        doc! { "locationGeo": Bson::Null },
+        vec![doc! {"$set": { "locationGeo": { "type": "Point", "coordinates": [{"$toDouble": "$location.lng"}, {"$toDouble": "$location.lat"}] }}},
+    ]).await?;
 
     Ok(())
 }
