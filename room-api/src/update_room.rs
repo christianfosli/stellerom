@@ -44,10 +44,10 @@ pub async fn update_room(
                 external_id: payload.external_id,
                 name: payload.name,
                 location: payload.location,
-                location_geo: Some(Geometry::new(Value::Point(vec![
+                location_geo: Geometry::new(Value::Point(vec![
                     payload.location.lng,
                     payload.location.lat,
-                ]))),
+                ])),
                 ratings: payload.ratings,
             },
         )

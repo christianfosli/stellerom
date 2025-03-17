@@ -9,7 +9,7 @@ pub struct ChangingRoom {
     pub name: String,
     pub location: Location,
     #[serde(rename = "locationGeo")]
-    pub location_geo: Option<Geometry>,
+    pub location_geo: Geometry,
     pub ratings: Option<Ratings>,
     #[serde(rename = "externalId")]
     pub external_id: Option<String>,
