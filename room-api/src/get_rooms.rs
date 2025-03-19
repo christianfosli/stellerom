@@ -1,16 +1,16 @@
 use std::sync::LazyLock;
 
 use axum::{
-    extract::{Path, State},
-    http::{header, StatusCode},
-    response::IntoResponse,
     Json,
+    extract::{Path, State},
+    http::{StatusCode, header},
+    response::IntoResponse,
 };
 use futures::TryStreamExt;
-use geojson::{feature::Id, Feature, FeatureCollection, JsonObject};
+use geojson::{Feature, FeatureCollection, JsonObject, feature::Id};
 use mongodb::{
-    bson::{doc, Uuid},
     Database,
+    bson::{Uuid, doc},
 };
 use serde_json::Value;
 
@@ -66,9 +66,7 @@ pub async fn get_all_rooms_v2(
 
     let rooms_geo = rooms
         .into_iter()
-        .filter_map(|r| {
-            // ^ Replace with ord map when data migr complete
-
+        .map(|r| {
             // Properties
             let mut props = JsonObject::new();
             props.insert(String::from("name"), Value::String(r.name));
@@ -91,13 +89,13 @@ pub async fn get_all_rooms_v2(
             }
 
             // Geo Feature
-            r.location_geo.map(|geo| Feature {
+            Feature {
                 bbox: None,
-                geometry: Some(geo),
+                geometry: Some(r.location_geo),
                 id: Some(Id::String(r.id.to_string())),
                 properties: Some(props),
                 foreign_members: None,
-            })
+            }
         })
         .collect::<Vec<_>>();
 
