@@ -2,31 +2,32 @@
 // This file SHOULD be checked into source version control.
 // This file is automatically updated during development when running `dev.ts`.
 
-import * as $0 from "./routes/_app.tsx";
-import * as $1 from "./routes/about.tsx";
-import * as $2 from "./routes/index.tsx";
-import * as $3 from "./routes/new-review.tsx";
-import * as $4 from "./routes/new-room.tsx";
-import * as $5 from "./routes/rooms/[id].tsx";
-import * as $$0 from "./islands/EditRoom.tsx";
-import * as $$1 from "./islands/Map.tsx";
-import * as $$2 from "./islands/RangeInput.tsx";
+import * as $_app from "./routes/_app.tsx";
+import * as $about from "./routes/about.tsx";
+import * as $index from "./routes/index.tsx";
+import * as $new_review from "./routes/new-review.tsx";
+import * as $new_room from "./routes/new-room.tsx";
+import * as $rooms_id_ from "./routes/rooms/[id].tsx";
+import * as $EditRoom from "./islands/EditRoom.tsx";
+import * as $Map from "./islands/Map.tsx";
+import * as $RangeInput from "./islands/RangeInput.tsx";
+import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
   routes: {
-    "./routes/_app.tsx": $0,
-    "./routes/about.tsx": $1,
-    "./routes/index.tsx": $2,
-    "./routes/new-review.tsx": $3,
-    "./routes/new-room.tsx": $4,
-    "./routes/rooms/[id].tsx": $5,
+    "./routes/_app.tsx": $_app,
+    "./routes/about.tsx": $about,
+    "./routes/index.tsx": $index,
+    "./routes/new-review.tsx": $new_review,
+    "./routes/new-room.tsx": $new_room,
+    "./routes/rooms/[id].tsx": $rooms_id_,
   },
   islands: {
-    "./islands/EditRoom.tsx": $$0,
-    "./islands/Map.tsx": $$1,
-    "./islands/RangeInput.tsx": $$2,
+    "./islands/EditRoom.tsx": $EditRoom,
+    "./islands/Map.tsx": $Map,
+    "./islands/RangeInput.tsx": $RangeInput,
   },
   baseUrl: import.meta.url,
-};
+} satisfies Manifest;
 
 export default manifest;

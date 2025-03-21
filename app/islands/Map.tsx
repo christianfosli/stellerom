@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { tw } from "twind";
 import { Loader } from "@googlemaps/js-api-loader";
 import { ChangingRoom } from "../utils/models.ts";
 
@@ -82,15 +81,15 @@ export default function MyMap(props: MapProps) {
             <h3 class="${tw`text-md font-bold`}">${r.name}</h3>
             ${
             r.ratings
-              ? `<ul class="${tw`max-w-sm list-none py-2 text-sm`}">
+              ? `<ul class="max-w-sm list-none py-2 text-sm">
                   <li>Tilgjengelighet ${r.ratings.availability}/5</li>
                   <li>Sikkerhet ${r.ratings.safety}/5</li>
                   <li>Renslighet ${r.ratings.cleanliness}/5</li>
                 </ul>`
-              : `<p class="${tw`text-sm max-w-sm`}">Ingen anmeldelser enda..</p>`
+              : `<p class="text-sm max-w-sm">Ingen anmeldelser enda..</p>`
           }
             <a href="/rooms/${r.id}">
-              <button class="${tw`bg-gray-300 p-2 rounded-md border border-gray-700`}">
+              <button class="bg-gray-300 p-2 rounded-md border border-gray-700">
                 Gå til rom
               </button>
             </a>
@@ -140,7 +139,7 @@ export default function MyMap(props: MapProps) {
 
         infoWindow.setPosition(position);
         infoWindow.setContent(
-          `<h3 class="${tw`text-md font-bold`}">Du er her</h3>`,
+          `<h3 class="text-md font-bold">Du er her</h3>`,
         );
         map.setCenter(position);
         map.setZoom(17);
@@ -157,16 +156,16 @@ export default function MyMap(props: MapProps) {
       const lng = evt.latLng.lng();
       infoWindow.setContent(
         `<div>
-           <h3 class="${tw`text-md font-bold`}">Nytt stellerom</h3>
+           <h3 class="text-md font-bold">Nytt stellerom</h3>
            <p>
              Klikk på &quot;Fortsett&quot; om du er fornøyd med plasseringen.
            </p>
-           <p class="${tw`fond-semibold`}">
+           <p class="fond-semibold">
              Appen henter nå også data om stellerom fra <a href="https://www.openstreetmap.org/">OpenStreetMap</a>.
              Vurder å legge inn stellerom der først, med &quot;changing_table=yes&quot; så vil den dukke opp her automatisk ila ett døgn.
            </p>
             <a href="/new-room?lat=${lat}&lng=${lng}">
-           <button class="${tw`bg-gray-300 p-2 rounded-md border border-gray-700`}">
+           <button class="bg-gray-300 p-2 rounded-md border border-gray-700">
           Fortsett
           </button>
           </a>
@@ -199,7 +198,7 @@ export default function MyMap(props: MapProps) {
   return (
     <div>
       <p
-        class={tw`transition-color ease-in-out duration-200 ${
+        class={`transition-color ease-in-out duration-200 ${
           addingChangingRoom.active ? "bg-yellow-200" : "bg-transparent"
         }`}
       >
