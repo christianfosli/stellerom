@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { Loader } from "@googlemaps/js-api-loader";
+import { lazy } from "preact/compat";
 import { ChangingRoom } from "../utils/models.ts";
+import { IS_BROWSER } from "$fresh/runtime.ts";
 
 interface MapProps {
   apiKey: string;
@@ -12,6 +13,93 @@ const defaultZoom = 4;
 const localStorageMapPosKey = "mapPosition";
 
 export default function MyMap(props: MapProps) {
+  const Leaflet = IS_BROWSER ? lazy(() => import("leaflet")) : null; // Try to work around window is not defined error during SSR but it doesn't work properly
+
+  const mapDiv = useRef<HTMLDivElement | null>(null);
+
+  const [map, setMap] = useState<any>(null);
+  // deno-lint-ignore no-explicit-any
+  const [infoWindow, setInfoWindow] = useState<any>(null);
+  const [addingChangingRoom, setAddingChangingRoom] = useState<
+    // deno-lint-ignore no-explicit-any
+    { active: boolean; listener: any }
+  >({ active: false, listener: null });
+
+  useEffect(() => {
+    if (!IS_BROWSER) return;
+
+    // Initial map render
+    const lastMapPos = localStorage.getItem(localStorageMapPosKey);
+
+    const { center, zoom }: {
+      center: { lat: number; lng: number };
+      zoom: number;
+    } = lastMapPos
+      ? JSON.parse(lastMapPos)
+      : { center: centerOfNorway, zoom: defaultZoom };
+
+    const mp = Leaflet.map(mapDiv).setView([center.lat, center.lng], zoom);
+    setMap(mp);
+  }, [IS_BROWSER, Leaflet]);
+
+  const showCurrentLocation = () => {
+    alert("Not implemented");
+  };
+
+  const startAddingChangingRoom = () => {
+    alert("Not implemented");
+  };
+
+  const stopAddingChangingRoom = () => {
+    alert("Not implemented");
+  };
+
+  const infoMsg = map === null
+    ? "Laster kart..."
+    : addingChangingRoom.active
+    ? "Legg til stellerom - plasser rommet på kartet"
+    : "Finn og anmeld stellerom";
+
+  return (
+    <div>
+      <p
+        class={`transition-color ease-in-out duration-200 ${
+          addingChangingRoom.active ? "bg-yellow-200" : "bg-transparent"
+        }`}
+      >
+        {infoMsg}
+      </p>
+      <div ref={mapDiv} class="w-full h-96" id="roomsmap">
+      </div>
+      <button
+        class="inline-block bg-gray-300 p-2 rounded-md border border-gray-700"
+        type="button"
+        onClick={showCurrentLocation}
+      >
+        Gå til min plassering
+      </button>
+      {addingChangingRoom.active && (
+            <button
+              class="inline-block bg-yellow-400 p-2 rounded-md border border-gray-700"
+              type="button"
+              onClick={stopAddingChangingRoom}
+            >
+              Avbryt legg til stellerom
+            </button>
+          ) || (
+        <button
+          class="inline-block bg-gray-300 p-2 rounded-md border border-gray-700"
+          type="button"
+          onClick={startAddingChangingRoom}
+        >
+          Legg til nytt stellerom
+        </button>
+      )}
+    </div>
+  );
+}
+
+function _OrigMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
   // I couldn't figure out how to get objects loaded by Google Maps JavaScript API
