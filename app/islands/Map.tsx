@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { lazy } from "preact/compat";
 import { ChangingRoom } from "../utils/models.ts";
-import { IS_BROWSER } from "$fresh/runtime.ts";
 
 interface MapProps {
   apiKey: string;
@@ -13,10 +11,11 @@ const defaultZoom = 4;
 const localStorageMapPosKey = "mapPosition";
 
 export default function MyMap(props: MapProps) {
-  const Leaflet = IS_BROWSER ? lazy(() => import("leaflet")) : null; // Try to work around window is not defined error during SSR but it doesn't work properly
+  // const Leaflet = IS_BROWSER ? lazy(() => import("leaflet")) : null; // Try to work around window is not defined error during SSR but it doesn't work properly
 
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
+  const [L, setL] = useState<any>(null); // work-around for window is not defined during SSR
   const [map, setMap] = useState<any>(null);
   // deno-lint-ignore no-explicit-any
   const [infoWindow, setInfoWindow] = useState<any>(null);
@@ -25,11 +24,27 @@ export default function MyMap(props: MapProps) {
     { active: boolean; listener: any }
   >({ active: false, listener: null });
 
-  useEffect(() => {
-    if (!IS_BROWSER) return;
+  const leafletLoaded = !(L === null);
 
+  useEffect(() => {
+    // Import leaflet and set L (hopefully no longer needed when leaflet 2.0 release)
+    const importLeaflet = async () => {
+      const leaflet = await import("leaflet");
+      const L = leaflet.default;
+      console.log(`Loaded leaflet ${L.version}`);
+      setL(L);
+    };
+    importLeaflet();
+  }, []);
+
+  useEffect(() => {
     // Initial map render
+    if (L === null) {
+      return;
+    }
+
     const lastMapPos = localStorage.getItem(localStorageMapPosKey);
+    console.log(lastMapPos);
 
     const { center, zoom }: {
       center: { lat: number; lng: number };
@@ -38,9 +53,16 @@ export default function MyMap(props: MapProps) {
       ? JSON.parse(lastMapPos)
       : { center: centerOfNorway, zoom: defaultZoom };
 
-    const mp = Leaflet.map(mapDiv).setView([center.lat, center.lng], zoom);
+    const mp = L.map("roomsmap", { center: [center.lat, center.lng], zoom });
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution:
+        '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(mp);
+
     setMap(mp);
-  }, [IS_BROWSER, Leaflet]);
+  }, [leafletLoaded]);
 
   const showCurrentLocation = () => {
     alert("Not implemented");
