@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "preact/hooks";
-import { ChangingRoom } from "../utils/models.ts";
+import { Feature, FeatureCollection } from "geojson";
+import { Layer } from "leaflet";
 
 interface MapProps {
   apiKey: string;
-  changingRooms: ChangingRoom[];
+  changingRooms: FeatureCollection;
 }
 
 const centerOfNorway = { lat: 64.68, lng: 9.39 };
@@ -15,10 +16,11 @@ export default function MyMap(props: MapProps) {
 
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
+  // deno-lint-ignore no-explicit-any
   const [L, setL] = useState<any>(null); // work-around for window is not defined during SSR
+  // deno-lint-ignore no-explicit-any
   const [map, setMap] = useState<any>(null);
   // deno-lint-ignore no-explicit-any
-  const [infoWindow, setInfoWindow] = useState<any>(null);
   const [addingChangingRoom, setAddingChangingRoom] = useState<
     // deno-lint-ignore no-explicit-any
     { active: boolean; listener: any }
@@ -31,7 +33,7 @@ export default function MyMap(props: MapProps) {
     const importLeaflet = async () => {
       const leaflet = await import("leaflet");
       const L = leaflet.default;
-      console.log(`Loaded leaflet ${L.version}`);
+      console.info(`Loaded leaflet ${L.version}`);
       setL(L);
     };
     importLeaflet();
@@ -43,6 +45,7 @@ export default function MyMap(props: MapProps) {
       return;
     }
 
+    console.info("Loading initial map");
     const lastMapPos = localStorage.getItem(localStorageMapPosKey);
     console.log(lastMapPos);
 
@@ -59,6 +62,23 @@ export default function MyMap(props: MapProps) {
       maxZoom: 19,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    }).addTo(mp);
+
+    const onEachFeature = (feature: Feature, layer: Layer) => {
+      const ratingsHtml = feature.properties.ratings
+        ? `<ul class="list-disc py-2">
+            <li>Tilgjengelighet ${feature.properties.ratings?.availability}/5</li>
+            <li>Sikkerhet ${feature.properties.ratings?.safety}/5</li>
+            <li>Renslighet ${feature.properties.ratings?.cleanliness}/5</li>
+          </ul>`
+        : "<p>Ingen anmeldelser</p>";
+      layer.bindPopup(`<h3 class="text-lg">${feature.properties.name}</h3>
+        ${ratingsHtml}
+        <a href="/rooms/${feature.id}"><button class="p-3 shadow-md">Åpne rom</button></a>`);
+    };
+
+    L.geoJSON(props.changingRooms, {
+      onEachFeature,
     }).addTo(mp);
 
     setMap(mp);
