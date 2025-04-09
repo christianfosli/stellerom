@@ -30,7 +30,9 @@
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
     "$std/": "https://deno.land/std@0.216.0/",
-    "@googlemaps/js-api-loader": "https://cdn.skypack.dev/@googlemaps/js-api-loader@1.16.2?dts"
+    "leaflet": "npm:leaflet@1.9.4",
+    "leaflet/": "npm:leaflet@1.9.4/",
+    "geojson": "npm:geojson@0.5.0"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
