@@ -26,8 +26,6 @@ jobs:
       - name: Build step
         run: deno task build
         working-directory: app
-        env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
@@ -55,8 +53,6 @@ jobs:
       - name: Build step
         run: deno task build
         working-directory: app
-        env:
-          GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
