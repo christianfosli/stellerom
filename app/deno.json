@@ -32,6 +32,7 @@
     "$std/": "https://deno.land/std@0.216.0/",
     "leaflet": "npm:leaflet@1.9.4",
     "leaflet/": "npm:leaflet@1.9.4/",
+    "leaflet.fullscreen": "npm:leaflet.fullscreen@4.0.0",
     "geojson": "npm:geojson@0.5.0"
   },
   "compilerOptions": {

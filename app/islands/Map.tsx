@@ -36,6 +36,10 @@ export default function MyMap(props: MapProps) {
       const leaflet = await import("leaflet");
       const L = leaflet.default;
       console.info(`Loaded leaflet ${L.version}`);
+
+      await import("leaflet.fullscreen");
+      console.info("Loaded leaflet.fullscreen plugin");
+
       setL(L);
     };
     importLeaflet();
@@ -58,7 +62,14 @@ export default function MyMap(props: MapProps) {
       ? JSON.parse(lastMapPos)
       : { center: centerOfNorway, zoom: defaultZoom };
 
-    const mp = L.map("roomsmap", { center: [center.lat, center.lng], zoom });
+    const mp = L.map("roomsmap", {
+      center: [center.lat, center.lng],
+      zoom,
+      fullscreenControl: true,
+      fullscreenControlOptions: {
+        position: "topleft",
+      },
+    });
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,

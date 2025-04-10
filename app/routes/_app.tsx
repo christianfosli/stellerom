@@ -14,8 +14,15 @@ export default function App({ Component }: PageProps) {
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
           crossorigin=""
         />
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet.fullscreen@4.0.0/Control.FullScreen.css"
+        />
         {
-          // ^ TODO: Use leaflet.css from node_modules or import map instead of unpkg
+          // ^ Currently (Apr 25) fresh doesn't support importing (css) resources
+          // from npm packages, therefore the above two links uses different sources
+          // than the packages as specified in deno.json
+          // See https://github.com/denoland/fresh/issues/2115
         }
       </head>
       <body>
