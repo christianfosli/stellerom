@@ -30,9 +30,10 @@
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
     "$std/": "https://deno.land/std@0.216.0/",
-    "leaflet": "npm:leaflet@1.9.4",
-    "leaflet/": "npm:leaflet@1.9.4/",
+    "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js",
+    "leaflet/": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js/",
     "leaflet.fullscreen": "npm:leaflet.fullscreen@4.0.0",
+    "leaflet.types": "npm:@types/leaflet@1.9.18",
     "geojson": "npm:geojson@0.5.0"
   },
   "compilerOptions": {

@@ -1,6 +1,19 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Feature, FeatureCollection } from "geojson";
-import { Layer, LeafletEvent, LeafletEventHandlerFn, Popup } from "leaflet";
+import { Circle, GeoJSON, Map, Popup, TileLayer } from "leaflet";
+import type {
+  Circle as TCircle,
+  ErrorEvent,
+  GeoJSON as TGeoJson,
+  Layer,
+  LeafletMouseEvent,
+  LeafletMouseEventHandlerFn,
+  LocationEvent,
+  Map as TMap,
+  Popup as TPopup,
+  TileLayer as TTileLayer,
+} from "leaflet.types";
+// ^ TODO: Check if type imports become unneccesary when leaflet 2 is stable and @types/leaflet@2 is out
 
 interface MapProps {
   changingRooms: FeatureCollection;
@@ -11,46 +24,20 @@ const defaultZoom = 4;
 const localStorageMapPosKey = "mapPosition";
 
 export default function MyMap(props: MapProps) {
-  // const Leaflet = IS_BROWSER ? lazy(() => import("leaflet")) : null; // Try to work around window is not defined error during SSR but it doesn't work properly
-
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
-  // deno-lint-ignore no-explicit-any
-  const [L, setL] = useState<any>(null); // work-around for window is not defined during SSR
   // deno-lint-ignore no-explicit-any
   const [map, setMap] = useState<any>(null);
   const [err, setErr] = useState<string>("");
   const [addingChangingRoom, setAddingChangingRoom] = useState<
     {
       active: boolean;
-      listener: LeafletEventHandlerFn | null;
-      popup: Popup | null;
+      listener: LeafletMouseEventHandlerFn | null;
+      popup: TPopup | null;
     }
   >({ active: false, listener: null, popup: null });
 
-  const leafletLoaded = !(L === null);
-
   useEffect(() => {
-    // Import leaflet and set L (hopefully no longer needed when leaflet 2.0 release)
-    const importLeaflet = async () => {
-      const leaflet = await import("leaflet");
-      const L = leaflet.default;
-      console.info(`Loaded leaflet ${L.version}`);
-
-      await import("leaflet.fullscreen");
-      console.info("Loaded leaflet.fullscreen plugin");
-
-      setL(L);
-    };
-    importLeaflet();
-  }, []);
-
-  useEffect(() => {
-    // Initial map render
-    if (L === null) {
-      return;
-    }
-
     console.info("Loading initial map");
     const lastMapPos = localStorage.getItem(localStorageMapPosKey);
     console.log(lastMapPos);
@@ -62,20 +49,20 @@ export default function MyMap(props: MapProps) {
       ? JSON.parse(lastMapPos)
       : { center: centerOfNorway, zoom: defaultZoom };
 
-    const mp = L.map("roomsmap", {
+    const mp: TMap = new Map("roomsmap", {
       center: [center.lat, center.lng],
       zoom,
       fullscreenControl: true,
       fullscreenControlOptions: {
         position: "topleft",
       },
-    });
+    }) as unknown as TMap;
 
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    (new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(mp);
+    }) as unknown as TTileLayer).addTo(mp);
 
     const onEachFeature = (feature: Feature, layer: Layer) => {
       const ratingsHtml = feature.properties.ratings
@@ -94,27 +81,28 @@ export default function MyMap(props: MapProps) {
         </a>`);
     };
 
-    L.geoJSON(props.changingRooms, {
+    (new GeoJSON(props.changingRooms, {
       onEachFeature,
-    }).addTo(mp);
+    }) as unknown as TGeoJson).addTo(mp);
 
     mp.on(
       "locationfound",
-      (e: LeafletEvent) => L.circle(e.latlng, e.accuracy).addTo(mp),
+      (e: LocationEvent) =>
+        (new Circle(e.latlng, e.accuracy) as unknown as TCircle).addTo(mp),
     );
 
-    mp.on("locationerror", (e: LeafletEvent) => setErr(e.message));
+    mp.on("locationerror", (e: ErrorEvent) => setErr(e.message));
 
     setMap(mp);
-  }, [leafletLoaded]);
+  }, []);
 
   const showCurrentLocation = () => {
     map.locate({ setView: true, maxZoom: 18 });
   };
 
   const startAddingChangingRoom = () => {
-    const popup = L.popup();
-    const onClick = (e: LeafletEvent) =>
+    const popup = new Popup() as unknown as TPopup;
+    const onClick = (e: LeafletMouseEvent) =>
       popup.setLatLng(e.latlng)
         .setContent(
           `<div>
@@ -140,7 +128,7 @@ export default function MyMap(props: MapProps) {
 
   const stopAddingChangingRoom = () => {
     map.off("click", addingChangingRoom.listener);
-    if (addingChangingRoom.popup.isOpen()) {
+    if (addingChangingRoom.popup?.isOpen()) {
       addingChangingRoom.popup.close();
     }
 
