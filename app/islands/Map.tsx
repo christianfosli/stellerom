@@ -26,16 +26,15 @@ const localStorageMapPosKey = "mapPosition";
 export default function MyMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
-  // deno-lint-ignore no-explicit-any
-  const [map, setMap] = useState<any>(null);
+  const [map, setMap] = useState<TMap | null>(null);
   const [err, setErr] = useState<string>("");
   const [addingChangingRoom, setAddingChangingRoom] = useState<
     {
       active: boolean;
-      listener: LeafletMouseEventHandlerFn | null;
+      listener?: LeafletMouseEventHandlerFn | undefined;
       popup: TPopup | null;
     }
-  >({ active: false, listener: null, popup: null });
+  >({ active: false, listener: undefined, popup: null });
 
   useEffect(() => {
     console.info("Loading initial map");
@@ -97,7 +96,7 @@ export default function MyMap(props: MapProps) {
   }, []);
 
   const showCurrentLocation = () => {
-    map.locate({ setView: true, maxZoom: 18 });
+    map!.locate({ setView: true, maxZoom: 18 });
   };
 
   const startAddingChangingRoom = () => {
@@ -120,19 +119,19 @@ export default function MyMap(props: MapProps) {
           </button>
           </a>
          </div>`,
-        ).openOn(map);
-    map.on("click", onClick);
+        ).openOn(map!);
+    map!.on("click", onClick);
     setAddingChangingRoom({ active: true, listener: onClick, popup: popup });
     console.info("Listening for clicks for adding changing room");
   };
 
   const stopAddingChangingRoom = () => {
-    map.off("click", addingChangingRoom.listener);
+    map!.off("click", addingChangingRoom.listener);
     if (addingChangingRoom.popup?.isOpen()) {
       addingChangingRoom.popup.close();
     }
 
-    setAddingChangingRoom({ active: false, listener: null, popup: null });
+    setAddingChangingRoom({ active: false, listener: undefined, popup: null });
     console.info("Removed click listener for adding changing rooms");
   };
 

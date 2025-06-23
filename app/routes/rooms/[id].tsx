@@ -2,6 +2,7 @@ import { Handlers, PageProps } from "$fresh/server.ts";
 import { ChangingRoom, Review } from "../../utils/models.ts";
 import EditRoom from "../../islands/EditRoom.tsx";
 import Header from "../../utils/Header.tsx";
+import { SimpleMap } from "../../islands/SimpleMap.tsx";
 
 const roomApiUrl = Deno.env.get("ROOM_API_URL") ??
   "https://room-api-dev.stellerom.no";
@@ -93,7 +94,8 @@ export default function Room(
     <div class="p-4 mx-auto max-w-screen-md">
       <Header />
       <main>
-        <h2 class="text-lg font-bold">{room.name}</h2>
+        <h1 class="text-2xl font-bold">{room.name}</h1>
+        <SimpleMap lat={room.location.lat} lng={room.location.lng} />
         <ul class="list-none py-2 text-md">
           <li>Tilgjengelighet {room.ratings?.availability ?? "?"}/5</li>
           <li>Sikkerhet {room.ratings?.safety ?? "?"}/5</li>
@@ -101,7 +103,10 @@ export default function Room(
         </ul>
         <h3 class="text-md font-bold">Anmeldelser</h3>
         <a href={`/new-review?roomId=${room.id}&roomName=${room.name}`}>
-          <button class="bg-gray-300 p-2 rounded-md border border-gray-700">
+          <button
+            type="button"
+            class="bg-gray-300 p-2 rounded-md border border-gray-700"
+          >
             Anmeld stellerom
           </button>
         </a>

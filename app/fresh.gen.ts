@@ -11,6 +11,7 @@ import * as $rooms_id_ from "./routes/rooms/[id].tsx";
 import * as $EditRoom from "./islands/EditRoom.tsx";
 import * as $Map from "./islands/Map.tsx";
 import * as $RangeInput from "./islands/RangeInput.tsx";
+import * as $SimpleMap from "./islands/SimpleMap.tsx";
 import type { Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -26,6 +27,7 @@ const manifest = {
     "./islands/EditRoom.tsx": $EditRoom,
     "./islands/Map.tsx": $Map,
     "./islands/RangeInput.tsx": $RangeInput,
+    "./islands/SimpleMap.tsx": $SimpleMap,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;
