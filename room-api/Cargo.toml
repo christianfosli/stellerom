@@ -7,7 +7,7 @@ edition = "2024"
 
 [dependencies]
 axum = "0.8"
-bounded-integer = { version = "0.5", features = ["std", "types", "serde1"] }
+bounded-integer = { version = "0.6", features = ["std", "serde1"] }
 futures = "0.3"
 geojson = "0.24"
 mongodb = { version = "3" }

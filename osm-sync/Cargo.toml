@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1"
-bounded-integer = { version = "0.5", features = ["std", "types", "serde1"] }
+bounded-integer = { version = "0.6", features = ["std", "serde1"] }
 geojson = "0.24"
 mongodb = "3"
 osmgraph = "0.4"
