@@ -1,6 +1,7 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import { ChangingRoom, Review } from "../../utils/models.ts";
 import EditRoom from "../../islands/EditRoom.tsx";
+import { getSignedInUser } from "../../utils/auth.ts";
 import Header from "../../utils/Header.tsx";
 import { SimpleMap } from "../../islands/SimpleMap.tsx";
 
@@ -11,12 +12,16 @@ const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
 interface RoomData {
+  isSignedIn: bool;
+  userName?: string;
   room: ChangingRoom | { failureReason: string };
   reviews: Review[] | { failureReason: string };
 }
 
 export const handler: Handlers<RoomData> = {
-  async GET(_req, ctx) {
+  async GET(req, ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(req);
+
     const { id } = ctx.params;
     const fetchRoom = fetch(`${roomApiUrl}/rooms/${id}`);
     const fetchReviews = fetch(`${reviewApiUrl}/reviews?roomId=${id}`);
@@ -31,7 +36,7 @@ export const handler: Handlers<RoomData> = {
       ? await reviewsRes.json()
       : { failureReason: await reviewsRes.text() };
 
-    return ctx.render({ room, reviews });
+    return ctx.render({ isSignedIn, userName, room, reviews });
   },
 };
 
@@ -43,7 +48,7 @@ export default function Room(
   if ("failureReason" in room) {
     return (
       <div class="p-4 mx-auto max-w-screen-md">
-        <Header />
+        <Header isSignedIn={data.isSignedIn} userName={data.userName} />
         <main>
           <h2 class="text-lg font-bold text-red-700">
             En uventet feil har oppstått 😬
@@ -92,7 +97,7 @@ export default function Room(
 
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <Header />
+      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
       <main>
         <h1 class="text-2xl font-bold">{room.name}</h1>
         <SimpleMap lat={room.location.lat} lng={room.location.lng} />

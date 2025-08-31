@@ -42,7 +42,7 @@ export default function EditRoom(props: EditRoomProps) {
       });
       if (res.ok) {
         console.info("Room deleted successfully. Redirecting home.");
-        window.location.replace("/");
+        globalThis.location.replace("/");
       } else {
         console.error(`${res.status} ${res.statusText} response from api`);
         const resText = await res.text();
@@ -58,6 +58,7 @@ export default function EditRoom(props: EditRoomProps) {
     <div>
       <button
         class="bg-gray-300 p-2 rounded-md border border-gray-700"
+        type="button"
         onClick={handleChangeName}
       >
         Endre navn
@@ -65,6 +66,7 @@ export default function EditRoom(props: EditRoomProps) {
       &nbsp;&nbsp;
       <button
         class="bg-red-300 p-2 rounded-md border border-red-700"
+        type="button"
         onClick={handleDelete}
       >
         Slett stellerom

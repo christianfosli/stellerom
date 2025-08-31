@@ -26,6 +26,12 @@ jobs:
       - name: Build step
         run: deno task build
         working-directory: app
+        env:
+          AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
+          AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
+          AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
+          AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
+          AZURE_ADB2C_POLICY: ""
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
@@ -53,6 +59,12 @@ jobs:
       - name: Build step
         run: deno task build
         working-directory: app
+        env:
+          AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
+          AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
+          AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
+          AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
+          AZURE_ADB2C_POLICY: ""
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
