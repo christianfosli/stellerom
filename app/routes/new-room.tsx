@@ -1,7 +1,10 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
+import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
 
 interface NewRoomData {
+  isSignedIn: boolean;
+  userName?: string;
   method: "GET" | "POST";
   get: { lat: number | undefined; lng: number | undefined } | null;
   submit: "SUCCESS" | { failureReason: string } | null;
@@ -22,13 +25,23 @@ function parseFloatOrUndefined(x: string | undefined | null) {
 }
 
 export const handler: Handlers<NewRoomData> = {
-  GET(req, ctx) {
+  async GET(req, ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(req);
+
     const url = new URL(req.url);
     const lat = parseFloatOrUndefined(url.searchParams.get("lat"));
     const lng = parseFloatOrUndefined(url.searchParams.get("lng"));
-    return ctx.render({ method: "GET", get: { lat, lng }, submit: null });
+    return ctx.render({
+      isSignedIn,
+      userName,
+      method: "GET",
+      get: { lat, lng },
+      submit: null,
+    });
   },
   async POST(req, ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(req);
+
     const formData = await req.formData();
     const lat = parseFloat(formData.get("lat")?.valueOf() as string);
     const lng = parseFloat(formData.get("lng")?.valueOf() as string);
@@ -45,6 +58,8 @@ export const handler: Handlers<NewRoomData> = {
 
     if (res.ok) {
       return ctx.render({
+        isSignedIn,
+        userName,
         method: "POST",
         get: null,
         submit: "SUCCESS",
@@ -56,6 +71,8 @@ export const handler: Handlers<NewRoomData> = {
     const responseText = await res.text();
 
     return ctx.render({
+      isSignedIn,
+      userName,
       method: "POST",
       get: { lat, lng },
       submit: { failureReason: responseText },
@@ -151,7 +168,7 @@ export default function NewRoom({ data }: PageProps<NewRoomData>) {
 
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <Header />
+      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
       <main>
         <h2 class="text-lg font-bold">Legg til nytt stellerom</h2>
         {renderMainContent()}

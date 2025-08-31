@@ -4,9 +4,9 @@
     "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
     "cli": "echo \"import '\\$fresh/src/dev/cli.ts'\" | deno run --unstable -A -",
     "manifest": "deno task cli manifest $(pwd)",
-    "start": "deno run -A --watch=static/,routes/ dev.ts",
-    "build": "deno run -A dev.ts build",
-    "preview": "deno run -A main.ts",
+    "start": "deno run -A --unstable-kv --env-file=.env --watch=static/,routes/ dev.ts",
+    "build": "deno run -A --unstable-kv --env-file=.env dev.ts build",
+    "preview": "deno run -A --unstable-kv --env-file=.env main.ts",
     "update": "deno run -A -r https://fresh.deno.dev/update ."
   },
   "lint": {
@@ -22,6 +22,9 @@
   ],
   "imports": {
     "$fresh/": "https://deno.land/x/fresh@1.7.3/",
+    "@deno/kv-oauth": "jsr:@deno/kv-oauth@^0.11.0",
+    "@deno/kv-oauth/": "jsr:@deno/kv-oauth@^0.11.0/",
+    "@wok/djwt": "jsr:@wok/djwt@^3.0.2",
     "preact": "https://esm.sh/preact@10.22.0",
     "preact/": "https://esm.sh/preact@10.22.0/",
     "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
@@ -38,7 +41,8 @@
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "jsxImportSource": "preact",
+    "jsxImportSourceTypes": "@types/preact"
   },
   "nodeModulesDir": "auto"
 }

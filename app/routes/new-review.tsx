@@ -1,8 +1,11 @@
 import { Handlers, PageProps } from "$fresh/server.ts";
 import Header from "../utils/Header.tsx";
 import RangeInput from "../islands/RangeInput.tsx";
+import { getSignedInUser } from "../utils/auth.ts";
 
 interface NewReviewData {
+  isSignedIn: boolean;
+  userName?: string;
   formData: {
     roomId?: string;
     roomName?: string;
@@ -19,16 +22,22 @@ const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
 export const handler: Handlers<NewReviewData> = {
-  GET(req, ctx) {
+  async GET(req, ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(req);
+
     const url = new URL(req.url);
     const roomId = url.searchParams.get("roomId") as (string | undefined);
     const roomName = url.searchParams.get("roomName") as (string | undefined);
     return ctx.render({
+      isSignedIn,
+      userName,
       formData: { roomId, roomName },
       submitError: null,
     });
   },
   async POST(req, ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(req);
+
     const formData = await req.formData();
     const roomId = formData.get("roomId")?.valueOf() as string;
     const roomName = formData.get("roomName")?.valueOf() as string;
@@ -91,6 +100,8 @@ export const handler: Handlers<NewReviewData> = {
     const responseText = await res.text();
 
     return ctx.render({
+      isSignedIn,
+      userName,
       formData: {
         roomId,
         roomName,
@@ -140,7 +151,7 @@ function renderForm(data: NewReviewData) {
         max={5}
         startValue={3}
         name="availabilityRating"
-        required={true}
+        required
       />
       <RangeInput
         label="Sikkerhet"
@@ -148,7 +159,7 @@ function renderForm(data: NewReviewData) {
         max={5}
         startValue={3}
         name="safetyRating"
-        required={true}
+        required
       />
       <RangeInput
         label="Renglishet"
@@ -156,7 +167,7 @@ function renderForm(data: NewReviewData) {
         max={5}
         startValue={3}
         name="cleanlinessRating"
-        required={true}
+        required
       />
 
       <label class="block text-md font-bold mt-3" for="reviewText">
@@ -192,21 +203,21 @@ function renderForm(data: NewReviewData) {
 export default function NewRoom({ data }: PageProps<NewReviewData>) {
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <Header />
+      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
       <main>
         <h2 class="text-lg font-bold">
           Anmeld stellerom &quot;{data.formData.roomName}&quot;
         </h2>
         {data.submitError && (
-              <div class="bg-red-300 rounded p-2">
-                <h3 class="text-md font-bold">
-                  Vi beklager, en feil har oppstått.
-                </h3>
-                <p>
-                  {data.submitError?.failureReason}
-                </p>
-              </div>
-            ) || <></>}
+          <div class="bg-red-300 rounded p-2">
+            <h3 class="text-md font-bold">
+              Vi beklager, en feil har oppstått.
+            </h3>
+            <p>
+              {data.submitError?.failureReason}
+            </p>
+          </div>
+        )}
         {renderForm(data)}
       </main>
     </div>
