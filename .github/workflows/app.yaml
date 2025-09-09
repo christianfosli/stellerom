@@ -13,6 +13,12 @@ jobs:
   deploy_dev:
     runs-on: ubuntu-latest
     environment: Development
+    env:
+      AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
+      AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
+      AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
+      AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
+      AZURE_ADB2C_POLICY: ""
 
     steps:
       - name: Clone repository
@@ -26,12 +32,6 @@ jobs:
       - name: Build step
         run: deno task build
         working-directory: app
-        env:
-          AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
-          AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
-          AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
-          AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
-          AZURE_ADB2C_POLICY: ""
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
@@ -46,6 +46,12 @@ jobs:
     needs: deploy_dev
     runs-on: ubuntu-latest
     environment: Production
+    env:
+      AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
+      AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
+      AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
+      AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
+      AZURE_ADB2C_POLICY: ""
 
     steps:
       - name: Clone repository
@@ -59,12 +65,6 @@ jobs:
       - name: Build step
         run: deno task build
         working-directory: app
-        env:
-          AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
-          AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
-          AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
-          AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
-          AZURE_ADB2C_POLICY: ""
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
