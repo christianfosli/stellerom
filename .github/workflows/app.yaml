@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Development
     env:
-      APP_HOST: dev.stellerom.no
+      APP_HOST: https://dev.stellerom.no
       ROOM_API_URL: https://room-api-dev.stellerom.no
       REVIEW_API_URL: https://review-api-dev.stellerom.no
       AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
@@ -46,7 +46,9 @@ jobs:
 
       - name: Deploy
         run: |
-          deployctl deploy --prod --project=stellerom-dev --entrypoint=main.ts --env-file=.env
+          deployctl deploy --prod --project=stellerom-dev --entrypoint=main.ts --env-file=.env \
+          --env AZURE_ADB2C_POLICY="/"
+          # ^ AZURE_ADB2C_POLICY should preferably be empty, but need to give it a value to avoid getRequiredEnv failure
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
 
@@ -57,7 +59,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production
     env:
-      APP_HOST: www.stellerom.no
+      APP_HOST: https://www.stellerom.no
       ROOM_API_URL: https://room-api-prod.stellerom.no
       REVIEW_API_URL: https://review-api-prod.stellerom.no
       AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
@@ -83,7 +85,8 @@ jobs:
 
       - name: Deploy
         run: |
-          deployctl deploy --prod --project=christianfosli-stellerom --entrypoint=main.ts --env-file=.env
+          deployctl deploy --prod --project=christianfosli-stellerom --entrypoint=main.ts --env-file=.env \
+          # ^ AZURE_ADB2C_POLICY should preferably be empty, but need to give it a value to avoid getRequiredEnv failure
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
           
