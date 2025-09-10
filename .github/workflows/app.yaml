@@ -6,19 +6,25 @@ on:
       - .github/workflows/app.yaml
 
 permissions:
-  id-token: write # Needed for auth with Deno Deploy
   contents: read # Needed to clone the repository
+  # id-token: write # Needed for auth with Deno Deploy
+  # id-token currently not needed due to using deployctl cli instead of github action due to missing features in the action
+
+
+defaults:
+  run:
+    working-directory: app
 
 jobs:
   deploy_dev:
     runs-on: ubuntu-latest
     environment: Development
     env:
+      APP_HOST: dev.stellerom.no
+      ROOM_API_URL: https://room-api-dev.stellerom.no
+      REVIEW_API_URL: https://review-api-dev.stellerom.no
       AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
       AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
-      AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
-      AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
-      AZURE_ADB2C_POLICY: ""
 
     steps:
       - name: Clone repository
@@ -29,16 +35,20 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Build step
-        run: deno task build
-        working-directory: app
+      - name: Prepare .env file
+        run: cat .env.template | envsubst > .env
 
-      - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "stellerom-dev"
-          entrypoint: "main.ts"
-          root: "app"
+      - name: Build
+        run: deno task build
+
+      - name: Install deployment tool
+        run: deno install -gArf jsr:@deno/deployctl
+
+      - name: Deploy
+        run: |
+          deployctl deploy --prod --project=stellerom-dev --entrypoint=main.ts --env-file=.env
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
 
 
   deploy_prod:
@@ -47,11 +57,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: Production
     env:
+      APP_HOST: www.stellerom.no
+      ROOM_API_URL: https://room-api-prod.stellerom.no
+      REVIEW_API_URL: https://review-api-prod.stellerom.no
       AZURE_ADB2C_CLIENT_ID: ${{ vars.AZURE_ADB2C_CLIENT_ID }}
       AZURE_ADB2C_CLIENT_SECRET: ${{ secrets.AZURE_ADB2C_CLIENT_SECRET }}
-      AZURE_ADB2C_TENANT_ID: ${{ vars.AZURE_ADB2C_TENANT_ID }}
-      AZURE_ADB2C_DOMAIN: stellerom.ciamlogin.com
-      AZURE_ADB2C_POLICY: ""
 
     steps:
       - name: Clone repository
@@ -62,15 +72,18 @@ jobs:
         with:
           deno-version: v2.x
 
-      - name: Build step
-        run: deno task build
-        working-directory: app
+      - name: Prepare .env file
+        run: cat .env.template | envsubst > .env
 
-      - name: Upload to Deno Deploy
-        uses: denoland/deployctl@v1
-        with:
-          project: "christianfosli-stellerom"
-          entrypoint: "main.ts"
-          root: "app"
-          
+      - name: Build
+        run: deno task build
+
+      - name: Install deployment tool
+        run: deno install -gArf jsr:@deno/deployctl
+
+      - name: Deploy
+        run: |
+          deployctl deploy --prod --project=christianfosli-stellerom --entrypoint=main.ts --env-file=.env
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
           

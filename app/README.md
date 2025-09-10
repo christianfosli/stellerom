@@ -7,9 +7,16 @@ and deployed using Deno Deploy.
 
 Install Deno if needed.
 
+Prepare .env file
+
+```sh
+cp .env.template .env
+# Replace the required values as needed
+```
+
 Start the project:
 
-```
+```sh
 deno task start
 ```
 
