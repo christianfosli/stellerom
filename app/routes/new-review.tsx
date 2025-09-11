@@ -1,7 +1,8 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import Header from "../utils/Header.tsx";
 import RangeInput from "../islands/RangeInput.tsx";
 import { getSignedInUser } from "../utils/auth.ts";
+import { Handlers } from "fresh/compat";
 
 interface NewReviewData {
   isSignedIn: boolean;
@@ -22,7 +23,8 @@ const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
 export const handler: Handlers<NewReviewData> = {
-  async GET(req, ctx) {
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const url = new URL(req.url);
@@ -35,7 +37,8 @@ export const handler: Handlers<NewReviewData> = {
       submitError: null,
     });
   },
-  async POST(req, ctx) {
+  async POST(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const formData = await req.formData();

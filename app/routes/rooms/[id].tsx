@@ -1,9 +1,10 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import { ChangingRoom, Review } from "../../utils/models.ts";
 import EditRoom from "../../islands/EditRoom.tsx";
 import { getSignedInUser } from "../../utils/auth.ts";
 import Header from "../../utils/Header.tsx";
 import { SimpleMap } from "../../islands/SimpleMap.tsx";
+import { Handlers } from "fresh/compat";
 
 const roomApiUrl = Deno.env.get("ROOM_API_URL") ??
   "https://room-api-dev.stellerom.no";
@@ -19,7 +20,8 @@ interface RoomData {
 }
 
 export const handler: Handlers<RoomData> = {
-  async GET(req, ctx) {
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const { id } = ctx.params;

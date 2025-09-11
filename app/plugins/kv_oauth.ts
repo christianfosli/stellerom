@@ -1,5 +1,5 @@
 import { createAzureAdb2cOAuthConfig, createHelpers } from "@deno/kv-oauth";
-import type { Plugin } from "$fresh/server.ts";
+import type { Context, Plugin } from "fresh";
 import { storeAccessToken } from "../utils/auth.ts";
 
 const oauthConfig = createAzureAdb2cOAuthConfig({
@@ -20,28 +20,28 @@ export default {
   routes: [
     {
       path: "/auth/signin",
-      async handler(req) {
-        return await signIn(req);
+      async handler(ctx: Context<Record<string, unknown>>) {
+        return await signIn(ctx.req);
       },
     },
     {
       path: "/auth/callback",
-      async handler(req) {
-        const { response, sessionId, tokens } = await handleCallback(req);
+      async handler(ctx: Context<Record<string, unknown>>) {
+        const { response, sessionId, tokens } = await handleCallback(ctx.req);
         await storeAccessToken(sessionId, tokens);
         return response;
       },
     },
     {
       path: "/auth/signout",
-      async handler(req) {
-        return await signOut(req);
+      async handler(ctx: Context<Record<string, unknown>>) {
+        return await signOut(ctx.req);
       },
     },
     {
       path: "/auth/protected",
-      async handler(req) {
-        return await getSessionId(req) === undefined
+      async handler(ctx: Context<Record<string, unknown>>) {
+        return await getSessionId(ctx.req) === undefined
           ? new Response("Unauthorized", { status: 401 })
           : new Response("You are allowed");
       },

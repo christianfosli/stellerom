@@ -1,6 +1,7 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
+import { Handlers } from "fresh/compat";
 
 interface NewRoomData {
   isSignedIn: boolean;
@@ -25,7 +26,8 @@ function parseFloatOrUndefined(x: string | undefined | null) {
 }
 
 export const handler: Handlers<NewRoomData> = {
-  async GET(req, ctx) {
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const url = new URL(req.url);
@@ -39,7 +41,8 @@ export const handler: Handlers<NewRoomData> = {
       submit: null,
     });
   },
-  async POST(req, ctx) {
+  async POST(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const formData = await req.formData();

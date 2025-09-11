@@ -1,13 +1,10 @@
 {
-  "lock": false,
   "tasks": {
-    "check": "deno fmt --check && deno lint && deno check **/*.ts && deno check **/*.tsx",
-    "cli": "echo \"import '\\$fresh/src/dev/cli.ts'\" | deno run --unstable -A -",
-    "manifest": "deno task cli manifest $(pwd)",
-    "start": "deno run -A --unstable-kv --env-file=.env --watch=static/,routes/ dev.ts",
-    "build": "deno run -A --unstable-kv --env-file=.env dev.ts build",
-    "preview": "deno run -A --unstable-kv --env-file=.env main.ts",
-    "update": "deno run -A -r https://fresh.deno.dev/update ."
+    "check": "deno fmt --check && deno lint && deno check",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "deno serve -A --unstable-kv --env-file=.env main.ts",
+    "update": "deno run -A -r jsr:@fresh/update ."
   },
   "lint": {
     "rules": {
@@ -21,14 +18,14 @@
     "**/_fresh/*"
   ],
   "imports": {
-    "$fresh/": "https://deno.land/x/fresh@1.7.3/",
     "@deno/kv-oauth": "jsr:@deno/kv-oauth@^0.11.0",
     "@deno/kv-oauth/": "jsr:@deno/kv-oauth@^0.11.0/",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.0",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.13",
     "@wok/djwt": "jsr:@wok/djwt@^3.0.2",
-    "preact": "https://esm.sh/preact@10.22.0",
+    "preact": "npm:preact@^10.27.1",
     "preact/": "https://esm.sh/preact@10.22.0/",
-    "@preact/signals": "https://esm.sh/*@preact/signals@1.2.2",
-    "@preact/signals-core": "https://esm.sh/*@preact/signals-core@1.5.1",
+    "@preact/signals": "npm:@preact/signals@^2.3.1",
     "tailwindcss": "npm:tailwindcss@3.4.1",
     "tailwindcss/": "npm:/tailwindcss@3.4.1/",
     "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
@@ -37,12 +34,13 @@
     "leaflet/": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js/",
     "leaflet.fullscreen": "npm:leaflet.fullscreen@4.0.0",
     "leaflet.types": "npm:@types/leaflet@1.9.18",
-    "geojson": "npm:geojson@0.5.0"
+    "geojson": "npm:geojson@0.5.0",
+    "fresh": "jsr:@fresh/core@^2.0.0",
+    "vite": "npm:vite@^7.1.5"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "preact",
-    "jsxImportSourceTypes": "@types/preact"
+    "jsxImportSource": "preact"
   },
   "nodeModulesDir": "auto"
 }

@@ -1,6 +1,7 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
+import { Handlers } from "fresh/compat";
 
 interface ProfileProps {
   isSignedIn: boolean;
@@ -8,7 +9,8 @@ interface ProfileProps {
 }
 
 export const handler: Handlers<ProfileProps> = {
-  async GET(req, ctx) {
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
     return ctx.render({ isSignedIn, userName });
   },

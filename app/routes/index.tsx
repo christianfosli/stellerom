@@ -1,8 +1,9 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import Map from "../islands/Map.tsx";
 import Header from "../utils/Header.tsx";
 import { FeatureCollection } from "geojson";
 import { getSignedInUser } from "../utils/auth.ts";
+import { Handlers } from "fresh/compat";
 
 const roomApiUrl = Deno.env.get("ROOM_API_URL") ??
   "https://room-api-dev.stellerom.no";
@@ -14,8 +15,8 @@ interface HomeProps {
 }
 
 export const handler: Handlers<HomeProps> = {
-  async GET(req, ctx) {
-    const { isSignedIn, userName } = await getSignedInUser(req);
+  async GET(ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(ctx.req);
 
     const res = await fetch(`${roomApiUrl}/rooms-v2`);
     if (!res.ok) {
