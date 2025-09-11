@@ -1,19 +1,17 @@
-import { useEffect, useRef, useState } from "preact/hooks";
 import { Feature, FeatureCollection } from "geojson";
-import { Circle, GeoJSON, Map, Popup, TileLayer } from "leaflet";
-import type {
-  Circle as TCircle,
-  ErrorEvent,
-  GeoJSON as TGeoJson,
-  Layer,
-  LeafletMouseEvent,
-  LeafletMouseEventHandlerFn,
-  LocationEvent,
-  Map as TMap,
-  Popup as TPopup,
-  TileLayer as TTileLayer,
-} from "leaflet.types";
-// ^ TODO: Check if type imports become unneccesary when leaflet 2 is stable and @types/leaflet@2 is out
+import {
+  Circle,
+  type ErrorEvent,
+  GeoJSON,
+  type Layer,
+  type LeafletMouseEvent,
+  type LeafletMouseEventHandlerFn,
+  type LocationEvent,
+  Map,
+  Popup,
+  TileLayer,
+} from "leaflet";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface MapProps {
   changingRooms: FeatureCollection;
@@ -23,16 +21,16 @@ const centerOfNorway = { lat: 64.68, lng: 9.39 };
 const defaultZoom = 4;
 const localStorageMapPosKey = "mapPosition";
 
-export default function MyMap(props: MapProps) {
+export default function RoomsMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
-  const [map, setMap] = useState<TMap | null>(null);
+  const [map, setMap] = useState<Map | null>(null);
   const [err, setErr] = useState<string>("");
   const [addingChangingRoom, setAddingChangingRoom] = useState<
     {
       active: boolean;
       listener?: LeafletMouseEventHandlerFn | undefined;
-      popup: TPopup | null;
+      popup: Popup | null;
     }
   >({ active: false, listener: undefined, popup: null });
 
@@ -48,20 +46,16 @@ export default function MyMap(props: MapProps) {
       ? JSON.parse(lastMapPos)
       : { center: centerOfNorway, zoom: defaultZoom };
 
-    const mp: TMap = new Map("roomsmap", {
+    const mp: Map = new Map("roomsmap", {
       center: [center.lat, center.lng],
       zoom,
-      fullscreenControl: true,
-      fullscreenControlOptions: {
-        position: "topleft",
-      },
-    }) as unknown as TMap;
+    });
 
-    (new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    new TileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
       attribution:
         '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }) as unknown as TTileLayer).addTo(mp);
+    }).addTo(mp);
 
     const onEachFeature = (feature: Feature, layer: Layer) => {
       const ratingsHtml = feature.properties.ratings
@@ -80,14 +74,13 @@ export default function MyMap(props: MapProps) {
         </a>`);
     };
 
-    (new GeoJSON(props.changingRooms, {
+    new GeoJSON(props.changingRooms, {
       onEachFeature,
-    }) as unknown as TGeoJson).addTo(mp);
+    }).addTo(mp);
 
     mp.on(
       "locationfound",
-      (e: LocationEvent) =>
-        (new Circle(e.latlng, e.accuracy) as unknown as TCircle).addTo(mp),
+      (e: LocationEvent) => (new Circle(e.latlng, e.accuracy)).addTo(mp),
     );
 
     mp.on("locationerror", (e: ErrorEvent) => setErr(e.message));
@@ -100,7 +93,7 @@ export default function MyMap(props: MapProps) {
   };
 
   const startAddingChangingRoom = () => {
-    const popup = new Popup() as unknown as TPopup;
+    const popup = new Popup();
     const onClick = (e: LeafletMouseEvent) =>
       popup.setLatLng(e.latlng)
         .setContent(

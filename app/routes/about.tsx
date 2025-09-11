@@ -1,23 +1,10 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
-import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
+import { define } from "../utils/fresh.ts";
 
-interface AboutProps {
-  isSignedIn: boolean;
-  userName?: string;
-}
-
-export const handler: Handlers<AboutProps> = {
-  async GET(req, ctx) {
-    const { isSignedIn, userName } = await getSignedInUser(req);
-    return ctx.render({ isSignedIn, userName });
-  },
-};
-
-export default function About({ data }: PageProps<AboutProps>) {
+export default define.page(function About(ctx) {
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
+      <Header isSignedIn={ctx.state.isSignedIn} userName={ctx.state.userName} />
       <main>
         <h2 class="text-lg font-bold">Om oss</h2>
         <p class="mb-2">
@@ -44,4 +31,4 @@ export default function About({ data }: PageProps<AboutProps>) {
       </main>
     </div>
   );
-}
+});

@@ -1,9 +1,10 @@
 /// <reference lib="deno.unstable" />
 import type { Tokens } from "@deno/kv-oauth";
 import { decode } from "@wok/djwt";
-import { getSessionId } from "../plugins/kv_oauth.ts";
+import { getSessionId } from "../middlewares/kv_oauth.ts";
 
-const kv = await Deno.openKv();
+const path = Deno.env.get("DENO_KV_PATH");
+const kv = await Deno.openKv(path);
 
 export async function storeAccessToken(
   sessionId: string,

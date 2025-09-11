@@ -1,10 +1,7 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
-import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
+import { define } from "../utils/fresh.ts";
 
 interface NewRoomData {
-  isSignedIn: boolean;
-  userName?: string;
   method: "GET" | "POST";
   get: { lat: number | undefined; lng: number | undefined } | null;
   submit: "SUCCESS" | { failureReason: string } | null;
@@ -24,25 +21,21 @@ function parseFloatOrUndefined(x: string | undefined | null) {
   return undefined;
 }
 
-export const handler: Handlers<NewRoomData> = {
-  async GET(req, ctx) {
-    const { isSignedIn, userName } = await getSignedInUser(req);
-
-    const url = new URL(req.url);
+export const handler = define.handlers<NewRoomData>({
+  GET(ctx) {
+    const url = new URL(ctx.req.url);
     const lat = parseFloatOrUndefined(url.searchParams.get("lat"));
     const lng = parseFloatOrUndefined(url.searchParams.get("lng"));
-    return ctx.render({
-      isSignedIn,
-      userName,
-      method: "GET",
-      get: { lat, lng },
-      submit: null,
-    });
+    return {
+      data: {
+        method: "GET",
+        get: { lat, lng },
+        submit: null,
+      },
+    };
   },
-  async POST(req, ctx) {
-    const { isSignedIn, userName } = await getSignedInUser(req);
-
-    const formData = await req.formData();
+  async POST(ctx) {
+    const formData = await ctx.req.formData();
     const lat = parseFloat(formData.get("lat")?.valueOf() as string);
     const lng = parseFloat(formData.get("lng")?.valueOf() as string);
     const res = await fetch(`${roomApiUrl}/rooms`, {
@@ -57,28 +50,28 @@ export const handler: Handlers<NewRoomData> = {
     });
 
     if (res.ok) {
-      return ctx.render({
-        isSignedIn,
-        userName,
-        method: "POST",
-        get: null,
-        submit: "SUCCESS",
-      });
+      return {
+        data: {
+          method: "POST",
+          get: null,
+          submit: "SUCCESS",
+        },
+      };
     }
 
     console.error(`${res.status} ${res.statusText} error from room api`);
 
     const responseText = await res.text();
 
-    return ctx.render({
-      isSignedIn,
-      userName,
-      method: "POST",
-      get: { lat, lng },
-      submit: { failureReason: responseText },
-    });
+    return {
+      data: {
+        method: "POST",
+        get: { lat, lng },
+        submit: { failureReason: responseText },
+      },
+    };
   },
-};
+});
 
 function renderForm(data: NewRoomData) {
   return (
@@ -133,46 +126,48 @@ function renderForm(data: NewRoomData) {
   );
 }
 
-export default function NewRoom({ data }: PageProps<NewRoomData>) {
-  const renderMainContent = () => {
-    switch (data.method) {
-      case "GET": {
-        return renderForm(data);
-      }
-      case "POST": {
-        return (
-          <div>
-            {data.submit == "SUCCESS" && (
-                  <p>
-                    Stellerommet ble lagt til! Gå{" "}
-                    <a class="text-blue-700" href="/">tilbake hjem</a>{" "}
-                    å se den på kartet.
-                  </p>
-                ) ||
-              (
-                <>
-                  <h3>
-                    Vi beklager, en feil har oppstått.
-                  </h3>
-                  <pre>
+export default define.page<typeof handler>(
+  function NewRoom({ state, data }) {
+    const renderMainContent = () => {
+      switch (data.method) {
+        case "GET": {
+          return renderForm(data);
+        }
+        case "POST": {
+          return (
+            <div>
+              {data.submit == "SUCCESS" && (
+                    <p>
+                      Stellerommet ble lagt til! Gå{" "}
+                      <a class="text-blue-700" href="/">tilbake hjem</a>{" "}
+                      å se den på kartet.
+                    </p>
+                  ) ||
+                (
+                  <>
+                    <h3>
+                      Vi beklager, en feil har oppstått.
+                    </h3>
+                    <pre>
                     {JSON.stringify(data.submit)}
-                  </pre>
-                  {renderForm(data)}
-                </>
-              )}
-          </div>
-        );
+                    </pre>
+                    {renderForm(data)}
+                  </>
+                )}
+            </div>
+          );
+        }
       }
-    }
-  };
+    };
 
-  return (
-    <div class="p-4 mx-auto max-w-screen-md">
-      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
-      <main>
-        <h2 class="text-lg font-bold">Legg til nytt stellerom</h2>
-        {renderMainContent()}
-      </main>
-    </div>
-  );
-}
+    return (
+      <div class="p-4 mx-auto max-w-screen-md">
+        <Header isSignedIn={state.isSignedIn} userName={state.userName} />
+        <main>
+          <h2 class="text-lg font-bold">Legg til nytt stellerom</h2>
+          {renderMainContent()}
+        </main>
+      </div>
+    );
+  },
+);
