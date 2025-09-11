@@ -1,9 +1,10 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import { ChangingRoom, Review } from "../../utils/models.ts";
 import EditRoom from "../../islands/EditRoom.tsx";
 import { getSignedInUser } from "../../utils/auth.ts";
 import Header from "../../utils/Header.tsx";
 import { SimpleMap } from "../../islands/SimpleMap.tsx";
+import { define } from "../../utils/fresh.ts";
 
 const roomApiUrl = Deno.env.get("ROOM_API_URL") ??
   "https://room-api-dev.stellerom.no";
@@ -12,14 +13,15 @@ const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
 interface RoomData {
-  isSignedIn: bool;
+  isSignedIn: boolean;
   userName?: string;
   room: ChangingRoom | { failureReason: string };
   reviews: Review[] | { failureReason: string };
 }
 
-export const handler: Handlers<RoomData> = {
-  async GET(req, ctx) {
+export const handler = define.handlers<RoomData>({
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const { id } = ctx.params;
@@ -36,9 +38,9 @@ export const handler: Handlers<RoomData> = {
       ? await reviewsRes.json()
       : { failureReason: await reviewsRes.text() };
 
-    return ctx.render({ isSignedIn, userName, room, reviews });
+    return { data: { isSignedIn, userName, room, reviews } };
   },
-};
+});
 
 export default function Room(
   { data }: PageProps<RoomData>,

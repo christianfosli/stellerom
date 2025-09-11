@@ -1,6 +1,6 @@
 import { createAzureAdb2cOAuthConfig, createHelpers } from "@deno/kv-oauth";
-import type { Plugin } from "$fresh/server.ts";
 import { storeAccessToken } from "../utils/auth.ts";
+import { define } from "../utils/fresh.ts";
 
 const oauthConfig = createAzureAdb2cOAuthConfig({
   redirectUri: `${
@@ -15,36 +15,25 @@ const { signIn, handleCallback, signOut, getSessionId } = createHelpers(
 
 export { getSessionId };
 
-export default {
-  name: "kv-oauth",
-  routes: [
-    {
-      path: "/auth/signin",
-      async handler(req) {
-        return await signIn(req);
-      },
-    },
-    {
-      path: "/auth/callback",
-      async handler(req) {
-        const { response, sessionId, tokens } = await handleCallback(req);
-        await storeAccessToken(sessionId, tokens);
-        return response;
-      },
-    },
-    {
-      path: "/auth/signout",
-      async handler(req) {
-        return await signOut(req);
-      },
-    },
-    {
-      path: "/auth/protected",
-      async handler(req) {
-        return await getSessionId(req) === undefined
-          ? new Response("Unauthorized", { status: 401 })
-          : new Response("You are allowed");
-      },
-    },
-  ],
-} as Plugin;
+const kvOauth = define.middleware(async (ctx) => {
+  const path = new URL(ctx.req.url).pathname;
+  switch (path) {
+    case "/auth/signin":
+      return await signIn(ctx.req);
+    case "/auth/callback": {
+      const { response, sessionId, tokens } = await handleCallback(ctx.req);
+      await storeAccessToken(sessionId, tokens);
+      return response;
+    }
+    case "/auth/signout":
+      return await signOut(ctx.req);
+    case "/auth/protected":
+      return await getSessionId(ctx.req) === undefined
+        ? new Response("Unauthorized", { status: 401 })
+        : new Response("You are allowed");
+    default:
+      return await ctx.next();
+  }
+});
+
+export default kvOauth;

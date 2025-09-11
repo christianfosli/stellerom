@@ -1,8 +1,9 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import Map from "../islands/Map.tsx";
 import Header from "../utils/Header.tsx";
 import { FeatureCollection } from "geojson";
 import { getSignedInUser } from "../utils/auth.ts";
+import { define } from "../utils/fresh.ts";
 
 const roomApiUrl = Deno.env.get("ROOM_API_URL") ??
   "https://room-api-dev.stellerom.no";
@@ -13,22 +14,24 @@ interface HomeProps {
   changingRooms: FeatureCollection[];
 }
 
-export const handler: Handlers<HomeProps> = {
-  async GET(req, ctx) {
-    const { isSignedIn, userName } = await getSignedInUser(req);
+export const handler = define.handlers<HomeProps>({
+  async GET(ctx) {
+    const { isSignedIn, userName } = await getSignedInUser(ctx.req);
 
     const res = await fetch(`${roomApiUrl}/rooms-v2`);
     if (!res.ok) {
       console.error(`Non-OK status code from room API: ${res.status}`);
-      return ctx.render({ isSignedIn, userName, changingRooms: [] });
+      return { data: { isSignedIn, userName, changingRooms: [] } };
     }
-    return ctx.render({
-      isSignedIn,
-      userName,
-      changingRooms: await res.json(),
-    });
+    return {
+      data: {
+        isSignedIn,
+        userName,
+        changingRooms: await res.json(),
+      },
+    };
   },
-};
+});
 
 export default function Home({ data }: PageProps<HomeProps>) {
   return (

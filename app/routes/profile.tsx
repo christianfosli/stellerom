@@ -1,18 +1,20 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
+import { define } from "../utils/fresh.ts";
 
 interface ProfileProps {
   isSignedIn: boolean;
   userName?: string;
 }
 
-export const handler: Handlers<ProfileProps> = {
-  async GET(req, ctx) {
+export const handler = define.handlers<ProfileProps>({
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
-    return ctx.render({ isSignedIn, userName });
+    return { data: { isSignedIn, userName } };
   },
-};
+});
 
 export default function Profile({ data }: PageProps<ProfileProps>) {
   return (

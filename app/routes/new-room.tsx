@@ -1,6 +1,7 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
+import { define } from "../utils/fresh.ts";
 
 interface NewRoomData {
   isSignedIn: boolean;
@@ -24,22 +25,26 @@ function parseFloatOrUndefined(x: string | undefined | null) {
   return undefined;
 }
 
-export const handler: Handlers<NewRoomData> = {
-  async GET(req, ctx) {
+export const handler = define.handlers<NewRoomData>({
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const url = new URL(req.url);
     const lat = parseFloatOrUndefined(url.searchParams.get("lat"));
     const lng = parseFloatOrUndefined(url.searchParams.get("lng"));
-    return ctx.render({
-      isSignedIn,
-      userName,
-      method: "GET",
-      get: { lat, lng },
-      submit: null,
-    });
+    return {
+      data: {
+        isSignedIn,
+        userName,
+        method: "GET",
+        get: { lat, lng },
+        submit: null,
+      },
+    };
   },
-  async POST(req, ctx) {
+  async POST(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const formData = await req.formData();
@@ -57,28 +62,32 @@ export const handler: Handlers<NewRoomData> = {
     });
 
     if (res.ok) {
-      return ctx.render({
-        isSignedIn,
-        userName,
-        method: "POST",
-        get: null,
-        submit: "SUCCESS",
-      });
+      return {
+        data: {
+          isSignedIn,
+          userName,
+          method: "POST",
+          get: null,
+          submit: "SUCCESS",
+        },
+      };
     }
 
     console.error(`${res.status} ${res.statusText} error from room api`);
 
     const responseText = await res.text();
 
-    return ctx.render({
-      isSignedIn,
-      userName,
-      method: "POST",
-      get: { lat, lng },
-      submit: { failureReason: responseText },
-    });
+    return {
+      data: {
+        isSignedIn,
+        userName,
+        method: "POST",
+        get: { lat, lng },
+        submit: { failureReason: responseText },
+      },
+    };
   },
-};
+});
 
 function renderForm(data: NewRoomData) {
   return (

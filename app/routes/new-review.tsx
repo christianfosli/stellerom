@@ -1,7 +1,8 @@
-import { Handlers, PageProps } from "$fresh/server.ts";
+import { PageProps } from "fresh";
 import Header from "../utils/Header.tsx";
 import RangeInput from "../islands/RangeInput.tsx";
 import { getSignedInUser } from "../utils/auth.ts";
+import { define } from "../utils/fresh.ts";
 
 interface NewReviewData {
   isSignedIn: boolean;
@@ -21,21 +22,25 @@ interface NewReviewData {
 const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
-export const handler: Handlers<NewReviewData> = {
-  async GET(req, ctx) {
+export const handler = define.handlers<NewReviewData>({
+  async GET(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const url = new URL(req.url);
     const roomId = url.searchParams.get("roomId") as (string | undefined);
     const roomName = url.searchParams.get("roomName") as (string | undefined);
-    return ctx.render({
-      isSignedIn,
-      userName,
-      formData: { roomId, roomName },
-      submitError: null,
-    });
+    return {
+      data: {
+        isSignedIn,
+        userName,
+        formData: { roomId, roomName },
+        submitError: null,
+      },
+    };
   },
-  async POST(req, ctx) {
+  async POST(ctx) {
+    const req = ctx.req;
     const { isSignedIn, userName } = await getSignedInUser(req);
 
     const formData = await req.formData();
@@ -99,22 +104,24 @@ export const handler: Handlers<NewReviewData> = {
 
     const responseText = await res.text();
 
-    return ctx.render({
-      isSignedIn,
-      userName,
-      formData: {
-        roomId,
-        roomName,
-        availabilityRating,
-        safetyRating,
-        cleanlinessRating,
-        review,
-        reviewedBy,
+    return {
+      data: {
+        isSignedIn,
+        userName,
+        formData: {
+          roomId,
+          roomName,
+          availabilityRating,
+          safetyRating,
+          cleanlinessRating,
+          review,
+          reviewedBy,
+        },
+        submitError: { failureReason: responseText },
       },
-      submitError: { failureReason: responseText },
-    });
+    };
   },
-};
+});
 
 function renderForm(data: NewReviewData) {
   return (
