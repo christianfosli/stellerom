@@ -37,7 +37,9 @@ export default function Home({ data }: PageProps<HomeProps>) {
       <main>
         <Map changingRooms={data.changingRooms} />
       </main>
-      <a class="text-blue-700" href="/about">Mer info</a>.
+      <footer class="my-5">
+        <a class="text-blue-700" href="/about">Mer info</a>.
+      </footer>
     </div>
   );
 }

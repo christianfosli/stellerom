@@ -7,6 +7,7 @@ import * as $about from "./routes/about.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $new_review from "./routes/new-review.tsx";
 import * as $new_room from "./routes/new-room.tsx";
+import * as $osm_sync from "./routes/osm-sync.tsx";
 import * as $profile from "./routes/profile.tsx";
 import * as $rooms_id_ from "./routes/rooms/[id].tsx";
 import * as $EditRoom from "./islands/EditRoom.tsx";
@@ -22,6 +23,7 @@ const manifest = {
     "./routes/index.tsx": $index,
     "./routes/new-review.tsx": $new_review,
     "./routes/new-room.tsx": $new_room,
+    "./routes/osm-sync.tsx": $osm_sync,
     "./routes/profile.tsx": $profile,
     "./routes/rooms/[id].tsx": $rooms_id_,
   },

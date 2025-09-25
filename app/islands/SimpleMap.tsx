@@ -34,6 +34,8 @@ export function SimpleMap({ lat, lng, zoom }: SimpleMapProps) {
     const marker = new Marker([lat, lng]) as unknown as TMarker;
     marker.addTo(mp);
 
+    mp.dragging.disable();
+
     setMap(mp);
   }, []);
 

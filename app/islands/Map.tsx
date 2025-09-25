@@ -109,10 +109,6 @@ export default function MyMap(props: MapProps) {
            <p>
              Klikk på &quot;Fortsett&quot; om du er fornøyd med plasseringen.
            </p>
-           <p class="fond-semibold">
-             Appen henter nå også data om stellerom fra <a href="https://www.openstreetmap.org/">OpenStreetMap</a>.
-             Vurder å legge inn stellerom der først, med &quot;changing_table=yes&quot; så vil den dukke opp her automatisk ila ett døgn.
-           </p>
             <a href="/new-room?lat=${e.latlng.lat}&lng=${e.latlng.lng}">
            <button class="bg-gray-300 p-2 rounded-md border border-gray-700 font-semibold">
             Fortsett
@@ -143,13 +139,19 @@ export default function MyMap(props: MapProps) {
 
   return (
     <div>
-      <p
+      <div
         class={`transition-color ease-in-out duration-200 ${
           addingChangingRoom.active ? "bg-yellow-200" : "bg-transparent"
         }`}
       >
-        {infoMsg}
-      </p>
+        <p>{infoMsg}</p>
+        {addingChangingRoom.active && (
+          <p class="text-xs">
+            Appen henter også stellerom fra Open Street Map.{" "}
+            <a href="/osm-sync" class="underline text-blue-600">Mer info.</a>
+          </p>
+        )}
+      </div>
       <p
         class={`transition-color ease-in-out duration-200 ${
           err ? "bg-red-400" : "bg-transparent"
@@ -159,30 +161,32 @@ export default function MyMap(props: MapProps) {
       </p>
       <div ref={mapDiv} class="w-full h-96" id="roomsmap">
       </div>
-      <button
-        class="inline-block bg-gray-300 p-2 rounded-md border border-gray-700"
-        type="button"
-        onClick={showCurrentLocation}
-      >
-        Gå til min plassering
-      </button>
-      {addingChangingRoom.active && (
-            <button
-              class="inline-block bg-yellow-400 p-2 rounded-md border border-gray-700"
-              type="button"
-              onClick={stopAddingChangingRoom}
-            >
-              Avbryt legg til stellerom
-            </button>
-          ) || (
+      <div class="py-1 flex">
         <button
-          class="inline-block bg-gray-300 p-2 rounded-md border border-gray-700"
+          class="inline-block bg-gray-300 p-2 mr-1 rounded-md border border-gray-700 flex-auto"
           type="button"
-          onClick={startAddingChangingRoom}
+          onClick={showCurrentLocation}
         >
-          Legg til nytt stellerom
+          Gå til min plassering
         </button>
-      )}
+        {addingChangingRoom.active && (
+              <button
+                class="inline-block bg-yellow-400 p-2 ml-1 rounded-md border border-gray-700 flex-auto"
+                type="button"
+                onClick={stopAddingChangingRoom}
+              >
+                Avbryt legg til stellerom
+              </button>
+            ) || (
+          <button
+            class="inline-block bg-gray-300 p-2 ml-1 rounded-md border border-gray-700 flex-auto"
+            type="button"
+            onClick={startAddingChangingRoom}
+          >
+            Legg til nytt stellerom
+          </button>
+        )}
+      </div>
     </div>
   );
 }
