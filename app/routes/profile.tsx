@@ -1,28 +1,13 @@
-import { PageProps } from "fresh";
-import { getSignedInUser } from "../utils/auth.ts";
 import Header from "../utils/Header.tsx";
 import { define } from "../utils/fresh.ts";
 
-interface ProfileProps {
-  isSignedIn: boolean;
-  userName?: string;
-}
-
-export const handler = define.handlers<ProfileProps>({
-  async GET(ctx) {
-    const req = ctx.req;
-    const { isSignedIn, userName } = await getSignedInUser(req);
-    return { data: { isSignedIn, userName } };
-  },
-});
-
-export default function Profile({ data }: PageProps<ProfileProps>) {
+export default define.page(function Profile(ctx) {
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
+      <Header isSignedIn={ctx.state.isSignedIn} userName={ctx.state.userName} />
       <main>
         <h2 class="text-lg font-bold">
-          Bruker {data.userName ?? "Ukjent?"}
+          Bruker {ctx.state.userName ?? "Ukjent?"}
         </h2>
         <p class="my-2">
           Her skal det bli mulig å redigere visningsnavn og slette brukeren din.
@@ -39,4 +24,4 @@ export default function Profile({ data }: PageProps<ProfileProps>) {
       </main>
     </div>
   );
-}
+});

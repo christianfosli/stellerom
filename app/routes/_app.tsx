@@ -1,17 +1,15 @@
-import { PageProps } from "fresh";
+import { define } from "../utils/fresh.ts";
 
-export default function AppWrapper({ Component }: PageProps) {
+export default define.page(function App({ Component }) {
   return (
     <html>
       <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>app</title>
-        <link rel="stylesheet" href="/styles.css" />
+        <title>stellerom.no</title>
         <link
           rel="stylesheet"
           href="https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.css"
-          crossorigin=""
         />
         <link
           rel="stylesheet"
@@ -29,4 +27,4 @@ export default function AppWrapper({ Component }: PageProps) {
       </body>
     </html>
   );
-}
+});

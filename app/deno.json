@@ -1,9 +1,9 @@
 {
   "tasks": {
-    "check": "deno fmt --check && deno lint && deno check",
-    "dev": "vite",
+    "check": "deno fmt --check . && deno lint . && deno check .",
+    "dev": "deno run -A --unstable-kv vite",
     "build": "vite build",
-    "preview": "deno serve -A _fresh/server.js",
+    "start": "deno serve -A --unstable-kv _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update ."
   },
   "lint": {
@@ -20,27 +20,48 @@
   "imports": {
     "@deno/kv-oauth": "jsr:@deno/kv-oauth@^0.11.0",
     "@deno/kv-oauth/": "jsr:@deno/kv-oauth@^0.11.0/",
-    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.0",
-    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.13",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.4",
     "@wok/djwt": "jsr:@wok/djwt@^3.0.2",
-    "preact": "npm:preact@^10.27.1",
-    "preact/": "https://esm.sh/preact@10.22.0/",
-    "@preact/signals": "npm:@preact/signals@^2.3.1",
-    "tailwindcss": "npm:tailwindcss@3.4.1",
-    "tailwindcss/": "npm:/tailwindcss@3.4.1/",
-    "tailwindcss/plugin": "npm:/tailwindcss@3.4.1/plugin.js",
-    "$std/": "https://deno.land/std@0.216.0/",
+    "preact": "npm:preact@^10.27.2",
+    "@preact/signals": "npm:@preact/signals@^2.3.2",
+    "tailwindcss": "npm:tailwindcss@^4.1.14",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.14",
     "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js",
     "leaflet/": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js/",
     "leaflet.fullscreen": "npm:leaflet.fullscreen@4.0.0",
     "leaflet.types": "npm:@types/leaflet@1.9.18",
     "geojson": "npm:geojson@0.5.0",
-    "fresh": "jsr:@fresh/core@^2.0.2",
-    "vite": "npm:vite@^7.1.5"
+    "fresh": "jsr:@fresh/core@^2.1.1",
+    "vite": "npm:vite@^7.1.9"
   },
   "compilerOptions": {
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact"
+    "lib": [
+      "dom",
+      "dom.asynciterable",
+      "dom.iterable",
+      "deno.ns"
+    ],
+    "jsx": "precompile",
+    "jsxImportSource": "preact",
+    "jsxPrecompileSkipElements": [
+      "a",
+      "img",
+      "source",
+      "body",
+      "html",
+      "head",
+      "title",
+      "meta",
+      "script",
+      "link",
+      "style",
+      "base",
+      "noscript",
+      "template"
+    ],
+    "types": [
+      "vite/client"
+    ]
   },
   "nodeModulesDir": "auto"
 }

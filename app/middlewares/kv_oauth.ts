@@ -1,5 +1,5 @@
 import { createAzureAdb2cOAuthConfig, createHelpers } from "@deno/kv-oauth";
-import { storeAccessToken } from "../utils/auth.ts";
+import { getSignedInUser, storeAccessToken } from "../utils/auth.ts";
 import { define } from "../utils/fresh.ts";
 
 const oauthConfig = createAzureAdb2cOAuthConfig({
@@ -27,11 +27,17 @@ const kvOauth = define.middleware(async (ctx) => {
     }
     case "/auth/signout":
       return await signOut(ctx.req);
-    case "/auth/protected":
-      return await getSessionId(ctx.req) === undefined
-        ? new Response("Unauthorized", { status: 401 })
-        : new Response("You are allowed");
     default:
+      if (await getSessionId(ctx.req) === undefined) {
+        ctx.state.isSignedIn = false;
+        ctx.state.userName = null;
+      } else {
+        ctx.state.isSignedIn = true;
+
+        const { userName } = await getSignedInUser(ctx.req);
+        ctx.state.userName = userName;
+      }
+
       return await ctx.next();
   }
 });

@@ -1,12 +1,8 @@
-import { PageProps } from "fresh";
 import Header from "../utils/Header.tsx";
 import RangeInput from "../islands/RangeInput.tsx";
-import { getSignedInUser } from "../utils/auth.ts";
 import { define } from "../utils/fresh.ts";
 
 interface NewReviewData {
-  isSignedIn: boolean;
-  userName?: string;
   formData: {
     roomId?: string;
     roomName?: string;
@@ -23,17 +19,12 @@ const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
 export const handler = define.handlers<NewReviewData>({
-  async GET(ctx) {
-    const req = ctx.req;
-    const { isSignedIn, userName } = await getSignedInUser(req);
-
-    const url = new URL(req.url);
+  GET(ctx) {
+    const url = new URL(ctx.req.url);
     const roomId = url.searchParams.get("roomId") as (string | undefined);
     const roomName = url.searchParams.get("roomName") as (string | undefined);
     return {
       data: {
-        isSignedIn,
-        userName,
         formData: { roomId, roomName },
         submitError: null,
       },
@@ -41,7 +32,6 @@ export const handler = define.handlers<NewReviewData>({
   },
   async POST(ctx) {
     const req = ctx.req;
-    const { isSignedIn, userName } = await getSignedInUser(req);
 
     const formData = await req.formData();
     const roomId = formData.get("roomId")?.valueOf() as string;
@@ -106,8 +96,6 @@ export const handler = define.handlers<NewReviewData>({
 
     return {
       data: {
-        isSignedIn,
-        userName,
         formData: {
           roomId,
           roomName,
@@ -207,26 +195,31 @@ function renderForm(data: NewReviewData) {
   );
 }
 
-export default function NewRoom({ data }: PageProps<NewReviewData>) {
-  return (
-    <div class="p-4 mx-auto max-w-screen-md">
-      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
-      <main>
-        <h2 class="text-lg font-bold">
-          Anmeld stellerom &quot;{data.formData.roomName}&quot;
-        </h2>
-        {data.submitError && (
-          <div class="bg-red-300 rounded p-2">
-            <h3 class="text-md font-bold">
-              Vi beklager, en feil har oppstått.
-            </h3>
-            <p>
-              {data.submitError?.failureReason}
-            </p>
-          </div>
-        )}
-        {renderForm(data)}
-      </main>
-    </div>
-  );
-}
+export default define.page<typeof handler>(
+  function NewReview({ state, data }) {
+    return (
+      <div class="p-4 mx-auto max-w-screen-md">
+        <Header
+          isSignedIn={state.isSignedIn}
+          userName={state.userName}
+        />
+        <main>
+          <h2 class="text-lg font-bold">
+            Anmeld stellerom &quot;{data.formData.roomName}&quot;
+          </h2>
+          {data.submitError && (
+            <div class="bg-red-300 rounded p-2">
+              <h3 class="text-md font-bold">
+                Vi beklager, en feil har oppstått.
+              </h3>
+              <p>
+                {data.submitError?.failureReason}
+              </p>
+            </div>
+          )}
+          {renderForm(data)}
+        </main>
+      </div>
+    );
+  },
+);

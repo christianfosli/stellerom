@@ -1,7 +1,7 @@
 /// <reference lib="deno.unstable" />
 import type { Tokens } from "@deno/kv-oauth";
 import { decode } from "@wok/djwt";
-import { getSessionId } from "../plugins/kv_oauth.ts";
+import { getSessionId } from "../middlewares/kv_oauth.ts";
 
 const kv = await Deno.openKv();
 

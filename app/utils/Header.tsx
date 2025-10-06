@@ -1,6 +1,6 @@
 interface HeaderProps {
   isSignedIn: boolean;
-  userName?: string;
+  userName?: string | null;
 }
 
 export default function Header({ isSignedIn, userName }: HeaderProps) {

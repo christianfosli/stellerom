@@ -1,7 +1,5 @@
-import { PageProps } from "fresh";
 import { ChangingRoom, Review } from "../../utils/models.ts";
 import EditRoom from "../../islands/EditRoom.tsx";
-import { getSignedInUser } from "../../utils/auth.ts";
 import Header from "../../utils/Header.tsx";
 import { SimpleMap } from "../../islands/SimpleMap.tsx";
 import { define } from "../../utils/fresh.ts";
@@ -13,17 +11,12 @@ const reviewApiUrl = Deno.env.get("REVIEW_API_URL") ??
   "https://review-api-dev.stellerom.no";
 
 interface RoomData {
-  isSignedIn: boolean;
-  userName?: string;
   room: ChangingRoom | { failureReason: string };
   reviews: Review[] | { failureReason: string };
 }
 
 export const handler = define.handlers<RoomData>({
   async GET(ctx) {
-    const req = ctx.req;
-    const { isSignedIn, userName } = await getSignedInUser(req);
-
     const { id } = ctx.params;
     const fetchRoom = fetch(`${roomApiUrl}/rooms/${id}`);
     const fetchReviews = fetch(`${reviewApiUrl}/reviews?roomId=${id}`);
@@ -38,19 +31,19 @@ export const handler = define.handlers<RoomData>({
       ? await reviewsRes.json()
       : { failureReason: await reviewsRes.text() };
 
-    return { data: { isSignedIn, userName, room, reviews } };
+    return { data: { room, reviews } };
   },
 });
 
-export default function Room(
-  { data }: PageProps<RoomData>,
+export default define.page<typeof handler>(function Room(
+  { state, data },
 ) {
   const { room, reviews } = data;
 
   if ("failureReason" in room) {
     return (
       <div class="p-4 mx-auto max-w-screen-md">
-        <Header isSignedIn={data.isSignedIn} userName={data.userName} />
+        <Header isSignedIn={state.isSignedIn} userName={state.userName} />
         <main>
           <h2 class="text-lg font-bold text-red-700">
             En uventet feil har oppstått 😬
@@ -99,7 +92,7 @@ export default function Room(
 
   return (
     <div class="p-4 mx-auto max-w-screen-md">
-      <Header isSignedIn={data.isSignedIn} userName={data.userName} />
+      <Header isSignedIn={state.isSignedIn} userName={state.userName} />
       <main>
         <h1 class="text-2xl font-bold">{room.name}</h1>
         <SimpleMap lat={room.location.lat} lng={room.location.lng} />
@@ -123,4 +116,4 @@ export default function Room(
       </main>
     </div>
   );
-}
+});

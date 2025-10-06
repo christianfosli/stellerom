@@ -1,3 +1,10 @@
 import { createDefine } from "fresh";
 
-export const define = createDefine();
+// This specifies the type of "ctx.state" which is used to share
+// data among middlewares, layouts and routes.
+export interface State {
+  isSignedIn: boolean;
+  userName?: string | null;
+}
+
+export const define = createDefine<State>();

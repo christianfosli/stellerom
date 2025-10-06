@@ -23,7 +23,7 @@ const centerOfNorway = { lat: 64.68, lng: 9.39 };
 const defaultZoom = 4;
 const localStorageMapPosKey = "mapPosition";
 
-export default function MyMap(props: MapProps) {
+export default function RoomsMap(props: MapProps) {
   const mapDiv = useRef<HTMLDivElement | null>(null);
 
   const [map, setMap] = useState<TMap | null>(null);
