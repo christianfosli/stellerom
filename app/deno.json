@@ -3,7 +3,7 @@
     "check": "deno fmt --check . && deno lint . && deno check .",
     "dev": "deno run -A --unstable-kv vite",
     "build": "vite build",
-    "start": "deno serve -A --unstable-kv _fresh/server.js",
+    "start": "deno serve -A --unstable-kv --env-file=.env  _fresh/server.js",
     "update": "deno run -A -r jsr:@fresh/update ."
   },
   "lint": {
@@ -26,10 +26,7 @@
     "@preact/signals": "npm:@preact/signals@^2.3.2",
     "tailwindcss": "npm:tailwindcss@^4.1.14",
     "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.14",
-    "leaflet": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js",
-    "leaflet/": "https://unpkg.com/leaflet@2.0.0-alpha/dist/leaflet.js/",
-    "leaflet.fullscreen": "npm:leaflet.fullscreen@4.0.0",
-    "leaflet.types": "npm:@types/leaflet@1.9.18",
+    "leaflet": "npm:leaflet@2.0.0-alpha.1",
     "geojson": "npm:geojson@0.5.0",
     "fresh": "jsr:@fresh/core@^2.1.1",
     "vite": "npm:vite@^7.1.9"
