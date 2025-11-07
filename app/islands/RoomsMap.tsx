@@ -1,4 +1,3 @@
-import { useEffect, useRef, useState } from "preact/hooks";
 import { Feature, FeatureCollection } from "geojson";
 import {
   Circle,
@@ -12,6 +11,7 @@ import {
   Popup,
   TileLayer,
 } from "leaflet";
+import { useEffect, useRef, useState } from "preact/hooks";
 
 interface MapProps {
   changingRooms: FeatureCollection;
@@ -93,7 +93,7 @@ export default function RoomsMap(props: MapProps) {
   };
 
   const startAddingChangingRoom = () => {
-    const popup = new Popup() as unknown as TPopup;
+    const popup = new Popup();
     const onClick = (e: LeafletMouseEvent) =>
       popup.setLatLng(e.latlng)
         .setContent(

@@ -15,21 +15,24 @@
     }
   },
   "exclude": [
-    "**/_fresh/*"
+    "**/_fresh/*",
+    "client.ts",
+    "utils/leaflet-hacks.ts"
   ],
   "imports": {
     "@deno/kv-oauth": "jsr:@deno/kv-oauth@^0.11.0",
     "@deno/kv-oauth/": "jsr:@deno/kv-oauth@^0.11.0/",
-    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.4",
+    "@fresh/plugin-vite": "jsr:@fresh/plugin-vite@^1.0.7",
+    "@types/leaflet": "npm:@types/leaflet@^1.9.21",
     "@wok/djwt": "jsr:@wok/djwt@^3.0.2",
     "preact": "npm:preact@^10.27.2",
-    "@preact/signals": "npm:@preact/signals@^2.3.2",
-    "tailwindcss": "npm:tailwindcss@^4.1.14",
-    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.14",
+    "@preact/signals": "npm:@preact/signals@^2.4.0",
+    "tailwindcss": "npm:tailwindcss@^4.1.17",
+    "@tailwindcss/vite": "npm:@tailwindcss/vite@^4.1.17",
     "leaflet": "npm:leaflet@2.0.0-alpha.1",
     "geojson": "npm:geojson@0.5.0",
-    "fresh": "jsr:@fresh/core@^2.1.1",
-    "vite": "npm:vite@^7.1.9"
+    "fresh": "jsr:@fresh/core@^2.1.4",
+    "vite": "npm:vite@^7.2.2"
   },
   "compilerOptions": {
     "lib": [
